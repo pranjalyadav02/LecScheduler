@@ -1,0 +1,42 @@
+# Node modules
+node_modules/
+package-lock.json
+yarn.lock
+
+# Firebase
+.firebase/
+.firebaserc
+firebase-debug.log
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+build/
+*.min.js
+*.min.css
+
+# Temporary files
+*.tmp
+temp/
+cache/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Sensitive data
+credentials.json
+service-account-key.json

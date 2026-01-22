@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture Scheduler - Login</title>
+    <link rel="stylesheet" href="../css/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h1>📚 Lecture Scheduler</h1>
+            <p class="subtitle">Academic Lecture Management System</p>
+
+            <!-- Role Selection -->
+            <div class="role-selector">
+                <label>I am a:</label>
+                <div class="role-buttons">
+                    <button class="role-btn active" data-role="student">
+                        👤 Student
+                    </button>
+                    <button class="role-btn" data-role="faculty">
+                        👨‍🏫 Faculty
+                    </button>
+                    <button class="role-btn" data-role="admin">
+                        🔑 Administrator
+                    </button>
+                </div>
+            </div>
+
+            <!-- Login Form (Simplified) -->
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <!-- STUDENT LOGIN: Enrollment Number Only -->
+                <div id="studentForm" class="role-form active">
+                    <h2>Student Login</h2>
+                    <p class="instruction">Enter your enrollment number and password sent to your phone.</p>
+                    
+                    <label for="enrollmentNo">Enrollment Number:</label>
+                    <input type="text" id="enrollmentNo" placeholder="e.g., ENG2024001" required>
+                    
+                    <label for="studentPassword">Password:</label>
+                    <input type="password" id="studentPassword" placeholder="Password" required>
+                    
+                    <button type="submit" class="login-btn">Login</button>
+                    
+                    <div class="form-hint">
+                        <p>💡 <strong>First time?</strong> You should have received your credentials via SMS. If not, contact your institution.</p>
+                    </div>
+                </div>
+
+                <!-- FACULTY LOGIN: Email & Password -->
+                <div id="facultyForm" class="role-form">
+                    <h2>Faculty Login</h2>
+                    <p class="instruction">Enter your email and password.</p>
+                    
+                    <label for="facultyEmail">Email:</label>
+                    <input type="email" id="facultyEmail" placeholder="your.email@institution.edu" required>
+                    
+                    <label for="facultyPassword">Password:</label>
+                    <input type="password" id="facultyPassword" placeholder="Password" required>
+                    
+                    <button type="submit" class="login-btn">Login</button>
+                    
+                    <div class="form-hint">
+                        <p>💡 <strong>Forgot password?</strong> Contact the admin for password reset.</p>
+                    </div>
+                </div>
+
+                <!-- ADMIN LOGIN: Email & Password -->
+                <div id="adminForm" class="role-form">
+                    <h2>Administrator Login</h2>
+                    <p class="instruction">Enter admin credentials.</p>
+                    
+                    <label for="adminEmail">Email:</label>
+                    <input type="email" id="adminEmail" placeholder="admin@institution.edu" required>
+                    
+                    <label for="adminPassword">Password:</label>
+                    <input type="password" id="adminPassword" placeholder="Password" required>
+                    
+                    <button type="submit" class="login-btn">Login</button>
+                </div>
+            </form>
+
+            <!-- Status Message -->
+            <div id="statusMessage" class="status-message"></div>
+
+            <!-- Footer -->
+            <footer class="login-footer">
+                <p><small>© 2024 Lecture Scheduler. Version 1.0</small></p>
+                <p><small>For technical support, contact: <span id="supportContact">support@institution.edu</span></small></p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/login.js"></script>
+</body>
+</html>

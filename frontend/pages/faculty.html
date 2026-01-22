@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture Scheduler - Faculty Portal</title>
+    <link rel="stylesheet" href="../css/faculty.css">
+</head>
+<body>
+    <div class="faculty-container">
+        <!-- Header -->
+        <header class="faculty-header">
+            <h1>👨‍🏫 Faculty Portal</h1>
+            <div class="header-right">
+                <span id="facultyName">Faculty</span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </header>
+
+        <!-- Semester Display -->
+        <div class="semester-info">
+            <h2 id="semesterDisplay">Semester: --</h2>
+        </div>
+
+        <!-- Main Dashboard (Single-Action Cards) -->
+        <main class="dashboard-grid">
+
+            <!-- 1. View My Lectures -->
+            <div class="action-card">
+                <h2>📅 My Lectures</h2>
+                <p>View all your scheduled lectures this semester.</p>
+                <button class="primary-btn" onclick="showMyLectures()">View Lectures</button>
+            </div>
+
+            <!-- 2. Cancel Lecture -->
+            <div class="action-card">
+                <h2>❌ Cancel Lecture</h2>
+                <p>Cancel an upcoming lecture and notify students.</p>
+                <form onsubmit="handleCancelLecture(event)">
+                    <select id="cancelLectureSelect" required>
+                        <option value="">-- Select Lecture --</option>
+                    </select>
+                    <input type="text" id="cancelReason" placeholder="Reason (optional)">
+                    <button type="submit" class="primary-btn">Cancel Lecture</button>
+                </form>
+                <div id="cancelStatus" class="status-message"></div>
+            </div>
+
+            <!-- 3. Reschedule Lecture -->
+            <div class="action-card">
+                <h2>🔄 Reschedule Lecture</h2>
+                <p>Change time of an upcoming lecture.</p>
+                <form onsubmit="handleRescheduleLecture(event)">
+                    <select id="rescheduleLectureSelect" required>
+                        <option value="">-- Select Lecture --</option>
+                    </select>
+                    <label>New Date:</label>
+                    <select id="newDay" required>
+                        <option value="">Select Day</option>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                    </select>
+                    <label>New Time:</label>
+                    <input type="time" id="newStartTime" required>
+                    <input type="time" id="newEndTime" required>
+                    <button type="submit" class="primary-btn">Reschedule</button>
+                </form>
+                <div id="rescheduleStatus" class="status-message"></div>
+            </div>
+
+            <!-- 4. Send Announcement -->
+            <div class="action-card">
+                <h2>📢 Announce to Students</h2>
+                <p>Send notice about lectures or classes to all students.</p>
+                <form onsubmit="handleFacultyAnnouncement(event)">
+                    <input type="text" id="facultyAnnouncementTitle" placeholder="Title" required>
+                    <textarea id="facultyAnnouncementMsg" placeholder="Message" required rows="4"></textarea>
+                    <button type="submit" class="primary-btn">Send Announcement</button>
+                </form>
+                <div id="facultyAnnouncementStatus" class="status-message"></div>
+            </div>
+
+            <!-- 5. Attendance (Optional) -->
+            <div class="action-card">
+                <h2>📊 Lecture History</h2>
+                <p>View past lectures and any changes made.</p>
+                <button class="primary-btn" onclick="showLectureHistory()">View History</button>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ===== MODALS ===== -->
+
+    <!-- My Lectures Modal -->
+    <div id="lecturesModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeLecturesModal()">&times;</span>
+            <h2>My Lectures This Semester</h2>
+            <div id="lecturesList" class="list-container"></div>
+        </div>
+    </div>
+
+    <!-- Lecture History Modal -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeHistoryModal()">&times;</span>
+            <h2>Lecture History</h2>
+            <div id="historyList" class="list-container"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-functions.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/faculty.js"></script>
+</body>
+</html>

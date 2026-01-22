@@ -1,0 +1,974 @@
+/* ============================================================================
+   UNIFIED MINIMAL CSS FOR LECTURE SCHEDULER
+   Low-infrastructure design: Large buttons, clear layout, mobile-first
+   ============================================================================ */
+
+:root {
+    --primary-color: #2563eb;
+    --primary-dark: #1e40af;
+    --success-color: #059669;
+    --danger-color: #dc2626;
+    --warning-color: #f59e0b;
+    --info-color: #0891b2;
+    --border-color: #e5e7eb;
+    --bg-light: #f9fafb;
+    --text-color: #1f2937;
+    --text-light: #6b7280;
+    --padding-base: 1rem;
+    --radius-base: 0.5rem;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--text-color);
+    background-color: #fff;
+}
+
+/* ============================================================================
+   TYPOGRAPHY
+   ============================================================================ */
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+h1 {
+    font-size: 2rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+}
+
+h3 {
+    font-size: 1.25rem;
+}
+
+p {
+    margin-bottom: 0.5rem;
+    color: var(--text-light);
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ============================================================================
+   BUTTONS (PRIMARY ACTION)
+   Large, clear, one action per screen
+   ============================================================================ */
+
+button {
+    cursor: pointer;
+    border: none;
+    border-radius: var(--radius-base);
+    font-size: 1rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.primary-btn {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    width: 100%;
+    margin-top: 1rem;
+    border-radius: var(--radius-base);
+}
+
+.primary-btn:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.primary-btn:active {
+    transform: translateY(0);
+}
+
+.danger-btn {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.danger-btn:hover {
+    background-color: #b91c1c;
+}
+
+.logout-btn {
+    background-color: var(--danger-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+.logout-btn:hover {
+    background-color: #b91c1c;
+}
+
+/* ============================================================================
+   FORMS
+   ============================================================================ */
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+label {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="time"],
+input[type="file"],
+select,
+textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-base);
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus,
+input[type="time"]:focus,
+input[type="file"]:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* ============================================================================
+   STATUS MESSAGES (Error, Success, Warning, Info)
+   ============================================================================ */
+
+.status-message {
+    padding: 1rem;
+    border-radius: var(--radius-base);
+    margin: 1rem 0;
+    font-weight: 500;
+    text-align: center;
+    min-height: 1.5rem;
+    display: none;
+}
+
+.status-message:not(:empty) {
+    display: block;
+}
+
+.status-message.error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border-left: 4px solid var(--danger-color);
+}
+
+.status-message.success {
+    background-color: #d1fae5;
+    color: #065f46;
+    border-left: 4px solid var(--success-color);
+}
+
+.status-message.warning {
+    background-color: #fef3c7;
+    color: #92400e;
+    border-left: 4px solid var(--warning-color);
+}
+
+.status-message.info {
+    background-color: #cffafe;
+    color: #164e63;
+    border-left: 4px solid var(--info-color);
+}
+
+/* ============================================================================
+   LOGIN PAGE
+   ============================================================================ */
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+    padding: 1rem;
+}
+
+.login-box {
+    background: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    max-width: 500px;
+    width: 100%;
+}
+
+.login-box h1 {
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.login-box .subtitle {
+    text-align: center;
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+}
+
+.role-selector {
+    margin-bottom: 2rem;
+}
+
+.role-selector label {
+    text-align: center;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.role-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.role-btn {
+    padding: 0.75rem;
+    border: 2px solid var(--border-color);
+    background: white;
+    border-radius: var(--radius-base);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.role-btn.active {
+    border-color: var(--primary-color);
+    background-color: #eff6ff;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.role-btn:hover:not(.active) {
+    border-color: var(--primary-color);
+}
+
+.role-form {
+    display: none;
+}
+
+.role-form.active {
+    display: block;
+}
+
+.role-form h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+
+.instruction {
+    text-align: center;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-light);
+}
+
+.form-hint {
+    background-color: var(--bg-light);
+    padding: 1rem;
+    border-radius: var(--radius-base);
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+.form-hint p {
+    margin: 0;
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+.login-footer p {
+    margin-bottom: 0.25rem;
+}
+
+/* ============================================================================
+   ADMIN DASHBOARD
+   ============================================================================ */
+
+.admin-container,
+.faculty-container,
+.student-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-light);
+}
+
+.admin-header,
+.faculty-header,
+.student-header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.admin-header h1,
+.faculty-header h1,
+.student-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-right span {
+    font-weight: 500;
+}
+
+.semester-selector,
+.semester-info {
+    background: white;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.semester-selector label,
+.semester-info h2 {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.semester-selector select {
+    width: 100%;
+    max-width: 300px;
+}
+
+/* ============================================================================
+   DASHBOARD GRID (Single-Action Cards)
+   ============================================================================ */
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem 1.5rem;
+    flex: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.action-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid var(--primary-color);
+    display: flex;
+    flex-direction: column;
+}
+
+.action-card h2 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.action-card p {
+    margin-bottom: 1.5rem;
+    flex: 1;
+}
+
+.action-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.action-card input,
+.action-card select,
+.action-card textarea {
+    margin-bottom: 0;
+}
+
+.action-card .primary-btn {
+    margin-top: 0.5rem;
+}
+
+/* ============================================================================
+   MODALS
+   ============================================================================ */
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow-y: auto;
+}
+
+.modal-content {
+    background-color: white;
+    margin: 2% auto;
+    padding: 2rem;
+    border-radius: 0.75rem;
+    width: 95%;
+    max-width: 600px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.close-modal {
+    color: var(--text-light);
+    float: right;
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close-modal:hover {
+    color: var(--text-color);
+}
+
+/* ============================================================================
+   DATA TABLES
+   ============================================================================ */
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.data-table th {
+    background-color: var(--bg-light);
+    padding: 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.data-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table tr:hover {
+    background-color: #fafafa;
+}
+
+.list-container {
+    max-height: 500px;
+    overflow-y: auto;
+    margin-top: 1rem;
+}
+
+.empty-message {
+    text-align: center;
+    color: var(--text-light);
+    padding: 2rem 1rem;
+}
+
+/* ============================================================================
+   STATUS BADGES
+   ============================================================================ */
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-badge.scheduled {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.status-badge.cancelled {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.status-badge.rescheduled {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.status-badge.active {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+/* ============================================================================
+   FACULTY PAGE STYLES
+   ============================================================================ */
+
+.tab-navigation {
+    background: white;
+    border-bottom: 2px solid var(--border-color);
+    display: flex;
+    gap: 1rem;
+    padding: 0 1.5rem;
+    overflow-x: auto;
+}
+
+.tab-btn {
+    padding: 1rem 1.5rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-light);
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.content-area {
+    flex: 1;
+    padding: 2rem 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* ============================================================================
+   STUDENT PAGE STYLES
+   ============================================================================ */
+
+.timetable-grid {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.day-section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.day-section h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.lecture-card {
+    background-color: var(--bg-light);
+    padding: 1rem;
+    border-radius: var(--radius-base);
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--success-color);
+}
+
+.lecture-card.cancelled {
+    opacity: 0.6;
+    border-left-color: var(--danger-color);
+}
+
+.lecture-card.rescheduled {
+    border-left-color: var(--warning-color);
+}
+
+.lecture-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge.cancelled {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.badge.rescheduled {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.lecture-details {
+    font-size: 0.95rem;
+}
+
+.lecture-details p {
+    margin: 0.25rem 0;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.lecture-details strong {
+    min-width: 100px;
+}
+
+.notifications-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.notification-item {
+    background: white;
+    padding: 1.5rem;
+    border-radius: var(--radius-base);
+    border-left: 4px solid var(--info-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+}
+
+.notification-header strong {
+    flex: 1;
+    font-size: 1.05rem;
+}
+
+.notification-header small {
+    color: var(--text-light);
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.notification-body {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+}
+
+.notification-hint {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-style: italic;
+    margin: 0.5rem 0 0 0;
+}
+
+.chat-messages {
+    background: white;
+    border-radius: var(--radius-base);
+    padding: 1rem;
+    height: 400px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.chat-message {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.chat-message:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.chat-message.student {
+    background-color: #f0f9ff;
+    padding: 0.75rem;
+    border-radius: var(--radius-base);
+    border-left: 3px solid var(--info-color);
+}
+
+.chat-message.staff {
+    background-color: #f0fdf4;
+    padding: 0.75rem;
+    border-radius: var(--radius-base);
+    border-left: 3px solid var(--success-color);
+}
+
+.message-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
+}
+
+.message-header strong {
+    flex: 1;
+}
+
+.message-role {
+    background-color: rgba(37, 99, 235, 0.1);
+    color: var(--primary-color);
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.message-header small {
+    color: var(--text-light);
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.message-body {
+    word-break: break-word;
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.chat-input-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.chat-input-form textarea {
+    resize: none;
+}
+
+.chat-input-form .primary-btn {
+    margin-top: 0;
+}
+
+.student-footer {
+    background: white;
+    border-top: 1px solid var(--border-color);
+    padding: 1.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-top: auto;
+}
+
+.student-footer p {
+    margin: 0.25rem 0;
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    .role-buttons {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-header,
+    .faculty-header,
+    .student-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .tab-navigation {
+        gap: 0;
+        padding: 0;
+    }
+
+    .tab-btn {
+        flex: 1;
+        border-bottom: none;
+        border-right: 1px solid var(--border-color);
+        padding: 0.75rem;
+    }
+
+    .tab-btn.active {
+        border-right-color: var(--primary-color);
+        border-bottom: 3px solid var(--primary-color);
+        background-color: #f0f9ff;
+    }
+
+    .content-area {
+        padding: 1rem;
+    }
+
+    .login-box {
+        padding: 1.5rem;
+    }
+
+    .role-buttons {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 20% auto;
+        padding: 1.5rem;
+    }
+
+    .timetable-grid {
+        gap: 1rem;
+    }
+
+    .day-section {
+        padding: 1rem;
+    }
+
+    .chat-messages {
+        height: 300px;
+    }
+
+    .tab-navigation {
+        flex-direction: column;
+    }
+
+    .tab-btn {
+        text-align: left;
+        border-right: none;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .tab-btn.active {
+        border-right: none;
+        border-bottom-color: var(--primary-color);
+        background-color: transparent;
+    }
+}
+
+@media (max-width: 480px) {
+    html, body {
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.2rem;
+    }
+
+    .primary-btn {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+    }
+
+    .admin-header h1,
+    .faculty-header h1,
+    .student-header h1 {
+        font-size: 1.25rem;
+    }
+
+    .login-box {
+        padding: 1.25rem;
+    }
+
+    .action-card {
+        padding: 1rem;
+    }
+
+    .modal-content {
+        margin: 30% auto;
+    }
+}
+
+/* ============================================================================
+   PRINT STYLES
+   ============================================================================ */
+
+@media print {
+    .admin-header,
+    .faculty-header,
+    .student-header,
+    .logout-btn,
+    .primary-btn,
+    form {
+        display: none;
+    }
+
+    body {
+        background: white;
+    }
+
+    .data-table,
+    .timetable-grid,
+    .notifications-list {
+        page-break-inside: avoid;
+    }
+}

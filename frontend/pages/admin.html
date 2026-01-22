@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture Scheduler - Admin Dashboard</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Header -->
+        <header class="admin-header">
+            <h1>📚 Lecture Scheduler Admin</h1>
+            <div class="header-right">
+                <span id="adminName">Admin</span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </header>
+
+        <!-- Semester Selector -->
+        <div class="semester-selector">
+            <label for="semesterSelect">Select Semester:</label>
+            <select id="semesterSelect" onchange="loadSemesterData()">
+                <option value="">-- Choose Semester --</option>
+            </select>
+        </div>
+
+        <!-- Main Dashboard Grid (Single Action per Card) -->
+        <main class="dashboard-grid">
+
+            <!-- 1. Upload Timetable PDF -->
+            <div class="action-card">
+                <h2>📄 Upload Timetable</h2>
+                <p>Upload standardized PDF to auto-create lectures.</p>
+                <form onsubmit="handlePDFUpload(event)" class="upload-form">
+                    <input type="file" id="pdfFile" accept=".pdf" required>
+                    <button type="submit" class="primary-btn">Upload Timetable PDF</button>
+                </form>
+                <div id="uploadStatus" class="status-message"></div>
+            </div>
+
+            <!-- 2. View Lectures Status -->
+            <div class="action-card">
+                <h2>📅 Timetable Status</h2>
+                <p>View all scheduled lectures for this semester.</p>
+                <button class="primary-btn" onclick="showTimetableModal()">View Timetable</button>
+                <div id="lectureStatus" class="status-message"></div>
+            </div>
+
+            <!-- 3. Manage Faculty -->
+            <div class="action-card">
+                <h2>👨‍🏫 Manage Faculty</h2>
+                <p>Add, edit, or remove faculty for this semester.</p>
+                <button class="primary-btn" onclick="showFacultyModal()">Manage Faculty</button>
+            </div>
+
+            <!-- 4. Manage Students -->
+            <div class="action-card">
+                <h2>👥 Sync Students</h2>
+                <p>Import students from Google Form responses.</p>
+                <form onsubmit="handleStudentSync(event)" class="sync-form">
+                    <input type="text" id="formSpreadsheetId" placeholder="Google Sheet ID" required>
+                    <button type="submit" class="primary-btn">Sync Students</button>
+                </form>
+                <div id="syncStatus" class="status-message"></div>
+            </div>
+
+            <!-- 5. Send Bulk Announcement -->
+            <div class="action-card">
+                <h2>📢 Send Announcement</h2>
+                <p>Send notice to all students in this semester.</p>
+                <form onsubmit="handleAnnouncement(event)" class="announcement-form">
+                    <input type="text" id="announcementTitle" placeholder="Title" required>
+                    <textarea id="announcementMsg" placeholder="Message" required rows="4"></textarea>
+                    <button type="submit" class="primary-btn">Send Notice</button>
+                </form>
+                <div id="announcementStatus" class="status-message"></div>
+            </div>
+
+            <!-- 6. View Notifications Log -->
+            <div class="action-card">
+                <h2>📋 Notification Log</h2>
+                <p>View all notifications sent to students.</p>
+                <button class="primary-btn" onclick="showNotificationLog()">View Log</button>
+            </div>
+
+            <!-- 7. Archive Semester -->
+            <div class="action-card">
+                <h2>🔒 Archive Semester</h2>
+                <p>Archive this semester when it ends (cannot undo).</p>
+                <button class="primary-btn danger-btn" onclick="confirmArchiveSemester()">Archive Semester</button>
+                <div id="archiveStatus" class="status-message"></div>
+            </div>
+
+            <!-- 8. System Settings -->
+            <div class="action-card">
+                <h2>⚙️ Settings</h2>
+                <p>Configure app-wide settings (minimal options).</p>
+                <button class="primary-btn" onclick="showSettingsModal()">View Settings</button>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ===== MODALS ===== -->
+
+    <!-- Timetable Modal -->
+    <div id="timetableModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeTimetableModal()">&times;</span>
+            <h2>Semester Timetable</h2>
+            <div id="timetableList" class="list-container"></div>
+        </div>
+    </div>
+
+    <!-- Faculty Modal -->
+    <div id="facultyModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeFacultyModal()">&times;</span>
+            <h2>Manage Faculty</h2>
+            <form onsubmit="handleAddFaculty(event)" class="faculty-form">
+                <input type="text" id="facultyName" placeholder="Faculty Name" required>
+                <input type="text" id="facultyPhone" placeholder="Phone Number" required>
+                <input type="email" id="facultyEmail" placeholder="Email" required>
+                <button type="submit" class="primary-btn">Add Faculty</button>
+            </form>
+            <div id="facultyList" class="list-container"></div>
+        </div>
+    </div>
+
+    <!-- Notification Log Modal -->
+    <div id="notificationModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeNotificationModal()">&times;</span>
+            <h2>Notification History</h2>
+            <div id="notificationList" class="list-container"></div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeSettingsModal()">&times;</span>
+            <h2>Settings</h2>
+            <form onsubmit="handleSettingsSave(event)" class="settings-form">
+                <label>
+                    App Name:
+                    <input type="text" id="appName" required>
+                </label>
+                <label>
+                    Institution:
+                    <input type="text" id="institution" required>
+                </label>
+                <label>
+                    Support Phone:
+                    <input type="tel" id="supportPhone" required>
+                </label>
+                <label>
+                    Credential Delivery Method:
+                    <select id="deliveryMethod">
+                        <option value="sms">SMS</option>
+                        <option value="whatsapp">WhatsApp</option>
+                    </select>
+                </label>
+                <button type="submit" class="primary-btn">Save Settings</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-functions.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/admin.js"></script>
+</body>
+</html>

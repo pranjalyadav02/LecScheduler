@@ -1,0 +1,160 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ========================================================================
+    // HELPER FUNCTIONS
+    // ========================================================================
+
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Get user role
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    // Get user's assigned semesters
+    function getUserSemesters() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.semesters;
+    }
+
+    // Check if semester ID is in user's list
+    function hasSemesterAccess(semesterId) {
+      return semesterId in getUserSemesters();
+    }
+
+    // Check if user is admin
+    function isAdmin() {
+      return getUserRole() == 'admin';
+    }
+
+    // Check if user is faculty
+    function isFaculty() {
+      return getUserRole() == 'faculty';
+    }
+
+    // Check if user is student
+    function isStudent() {
+      return getUserRole() == 'student';
+    }
+
+    // ========================================================================
+    // USERS COLLECTION (Admin only for writes)
+    // ========================================================================
+    match /users/{userId} {
+      // Only admin can create/modify users
+      allow read: if isAuthenticated() && (isAdmin() || request.auth.uid == userId);
+      allow write: if isAdmin();
+    }
+
+    // ========================================================================
+    // GLOBAL ADMIN SETTINGS (Admin only)
+    // ========================================================================
+    match /admin_settings/{document=**} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ========================================================================
+    // SEMESTERS (Admin full access, others read)
+    // ========================================================================
+    match /semesters/{semesterId} {
+      allow read: if isAuthenticated() && (isAdmin() || hasSemesterAccess(semesterId));
+      allow write: if isAdmin();
+
+      // =====================================================================
+      // STUDENTS (Nested under semester)
+      // =====================================================================
+      match /students/{enrollmentNo} {
+        // Only admin can write
+        // Faculty can read for communication purposes
+        // Students can only read their own record
+        allow read: if isAuthenticated() && (
+          isAdmin() ||
+          isFaculty() && hasSemesterAccess(semesterId) ||
+          isStudent() && request.auth.uid == enrollmentNo
+        );
+        allow write: if isAdmin();
+      }
+
+      // =====================================================================
+      // FACULTY (Nested under semester)
+      // =====================================================================
+      match /faculty/{facultyId} {
+        allow read: if isAuthenticated() && hasSemesterAccess(semesterId);
+        allow write: if isAdmin();
+      }
+
+      // =====================================================================
+      // LECTURES (Nested under semester)
+      // =====================================================================
+      match /lectures/{lectureId} {
+        // All authenticated users in semester can read
+        // Faculty can modify their own lectures
+        // Admin can modify all
+        allow read: if isAuthenticated() && hasSemesterAccess(semesterId);
+        allow write: if isAdmin() || (
+          isFaculty() &&
+          hasSemesterAccess(semesterId) &&
+          (request.auth.uid == resource.data.faculty || !exists(resource))
+        );
+        allow delete: if isAdmin();
+      }
+
+      // =====================================================================
+      // NOTIFICATIONS (Nested under semester)
+      // =====================================================================
+      match /notifications/{notificationId} {
+        // All users in semester can read
+        allow read: if isAuthenticated() && hasSemesterAccess(semesterId);
+        // Faculty/Admin can create announcements
+        allow create: if isAuthenticated() && (
+          isAdmin() ||
+          isFaculty() && hasSemesterAccess(semesterId)
+        );
+        // Only system/admin can modify (for marking read, etc)
+        allow update: if isAdmin() || isStudent();
+        allow delete: if isAdmin();
+      }
+
+      // =====================================================================
+      // CHAT (Nested under semester)
+      // =====================================================================
+      match /chat/{document=**} {
+        // All users in semester can read chat messages
+        allow read: if isAuthenticated() && hasSemesterAccess(semesterId);
+
+        // Faculty/Admin can send messages
+        // Students can send messages (limited posting)
+        match /messages/{messageId} {
+          allow create: if isAuthenticated() && hasSemesterAccess(semesterId) && (
+            isAdmin() ||
+            isFaculty() ||
+            (isStudent() && request.resource.data.senderRole == 'student')
+          );
+          allow read: if isAuthenticated() && hasSemesterAccess(semesterId);
+          allow update: if false; // Messages cannot be edited
+          allow delete: if isAdmin();
+        }
+      }
+    }
+
+    // ========================================================================
+    // PDF UPLOADS (Admin only)
+    // ========================================================================
+    match /pdf_uploads/{document=**} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ========================================================================
+    // DEFAULT: DENY ALL
+    // ========================================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

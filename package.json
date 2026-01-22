@@ -1,0 +1,23 @@
+{
+  "name": "lecture-scheduler",
+  "version": "1.0.0",
+  "description": "Production-ready academic lecture scheduling system",
+  "author": "Your Institution",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/LecScheduler.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/LecScheduler/issues"
+  },
+  "homepage": "https://github.com/yourusername/LecScheduler#readme",
+  "keywords": [
+    "firebase",
+    "academic",
+    "scheduling",
+    "lecture",
+    "timetable",
+    "firestore"
+  ]
+}

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture Scheduler - Student Portal</title>
+    <link rel="stylesheet" href="../css/student.css">
+</head>
+<body>
+    <div class="student-container">
+        <!-- Header -->
+        <header class="student-header">
+            <h1>📚 My Timetable</h1>
+            <div class="header-right">
+                <span id="studentName">Student</span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </header>
+
+        <!-- Semester Info -->
+        <div class="semester-info">
+            <h2 id="semesterDisplay">Loading...</h2>
+        </div>
+
+        <!-- Main Tabs -->
+        <nav class="tab-navigation">
+            <button class="tab-btn active" onclick="switchTab('timetable')">📅 Timetable</button>
+            <button class="tab-btn" onclick="switchTab('notifications')">🔔 Notifications</button>
+            <button class="tab-btn" onclick="switchTab('chat')">💬 Semester Chat</button>
+        </nav>
+
+        <main class="content-area">
+
+            <!-- TAB 1: TIMETABLE (READ-ONLY) -->
+            <section id="timetable" class="tab-content active">
+                <h2>My Timetable</h2>
+                <p class="instructions">Your lectures for this semester. Last updated: <span id="lastUpdated">--</span></p>
+                
+                <div id="timetableGrid" class="timetable-grid">
+                    <!-- Dynamically populated -->
+                </div>
+
+                <div id="timetableStatus" class="status-message"></div>
+            </section>
+
+            <!-- TAB 2: NOTIFICATIONS (READ-ONLY) -->
+            <section id="notifications" class="tab-content">
+                <h2>Notifications & Announcements</h2>
+                <p class="instructions">View important updates about lectures and events.</p>
+                
+                <div id="notificationsList" class="notifications-list">
+                    <!-- Dynamically populated -->
+                </div>
+
+                <div id="notificationsStatus" class="status-message"></div>
+            </section>
+
+            <!-- TAB 3: CHAT (READ-ONLY for students) -->
+            <section id="chat" class="tab-content">
+                <h2>Semester Chat</h2>
+                <p class="instructions">Official semester announcements and discussions (read-only).</p>
+                
+                <div id="chatMessages" class="chat-messages">
+                    <!-- Dynamically populated -->
+                </div>
+
+                <div id="chatStatus" class="status-message"></div>
+                
+                <!-- Message input (optional: allow limited student posting) -->
+                <form onsubmit="handleSendMessage(event)" class="chat-input-form">
+                    <textarea id="messageInput" placeholder="Type your message..." rows="3" maxlength="500"></textarea>
+                    <button type="submit" class="primary-btn">Send</button>
+                </form>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="student-footer">
+            <p>💡 Tip: Check notifications regularly for lecture updates.</p>
+            <p><small>Questions? Contact: <span id="supportPhone">--</span></small></p>
+        </footer>
+    </div>
+
+    <!-- Service Worker for offline support -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('../js/service-worker.js').catch(err => {
+                console.log('Service Worker registration failed:', err);
+            });
+        }
+    </script>
+
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/student.js"></script>
+</body>
+</html>
