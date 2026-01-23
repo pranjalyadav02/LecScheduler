@@ -53,7 +53,7 @@ This guide explains how to replace Firebase Cloud Functions with free **Google A
    ```
    ```
    Property Name: TIMETABLE_FOLDER_ID
-   Value: [Your Google Drive Folder ID where PDFs are stored]
+   Value: [See Step 6 below for how to get this]
    ```
 
 #### Step 4: Deploy as Web App
@@ -75,13 +75,30 @@ This guide explains how to replace Firebase Cloud Functions with free **Google A
    - Time of day: (your choice)
 4. Save
 
-#### Step 6: Store PDF in Drive
-1. Create a folder in Google Drive: `LecScheduler-Timetables`
-2. Copy the folder ID from the URL (after `/folders/`)
-3. Paste a file named: `{semesterId}_timetable.pdf`
-   - Example: `sem-2024-s1_timetable.pdf`
+#### Step 6: Create Google Drive Folder and Get Folder ID
+**This determines where PDFs are stored - it can be anywhere in your Drive**
 
-#### Step 7: Test
+1. Open [Google Drive](https://drive.google.com)
+2. Create a new folder: `LecScheduler-Timetables` (or any name you prefer)
+3. **Get the Folder ID:**
+   - Right-click the folder → **Share**
+   - Look at the URL in the address bar
+   - It looks like: `https://drive.google.com/drive/folders/**FOLDER_ID_HERE**`
+   - Copy the long ID after `/folders/`
+4. Go back to Google Apps Script editor
+5. Click **Project Settings** → **Script properties**
+6. Update the `TIMETABLE_FOLDER_ID` property with your folder ID
+7. Save
+
+**To change the folder later:** Just update the `TIMETABLE_FOLDER_ID` in Script properties - no code changes needed.
+
+#### Step 7: Store PDF in Drive
+1. Place your timetable PDF in the folder you created above
+2. Name it: `{semesterId}_timetable.pdf`
+   - Example: `sem-2024-s1_timetable.pdf`
+3. The script will automatically detect and process it hourly
+
+#### Step 8: Test
 1. In Google Apps Script editor, click **Run** next to `checkForNewPDFs`
 2. Check the **Execution log** (View → Execution log)
 3. Go to Firebase Console → Firestore → `semesters/{semesterId}/lectures`
