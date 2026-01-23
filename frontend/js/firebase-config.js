@@ -2,15 +2,15 @@
 // FIREBASE CONFIGURATION
 // ============================================================================
 
-// IMPORTANT: Replace with your actual Firebase config
+// Firebase configuration for lecscheduler-4e36b
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_ID",
-    appId: "YOUR_APP_ID",
-    measurementId: "YOUR_MEASUREMENT_ID"
+    apiKey: "AIzaSyDraOcEe3NMokWlhPtEQyXi8vg09MsZjMc",
+    authDomain: "lecscheduler-4e36b.firebaseapp.com",
+    projectId: "lecscheduler-4e36b",
+    storageBucket: "lecscheduler-4e36b.firebasestorage.app",
+    messagingSenderId: "114388534580",
+    appId: "1:114388534580:web:971a79bcfef075d7985161",
+    measurementId: "G-90W2DL6GQN"
 };
 
 // Initialize Firebase
