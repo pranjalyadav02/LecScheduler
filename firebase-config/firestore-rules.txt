@@ -150,6 +150,14 @@ service cloud.firestore {
     }
 
     // ========================================================================
+    // MESSAGE LOGS (Admin only)
+    // ========================================================================
+    match /message_logs/{logId} {
+      // Message logs may contain credentials and sensitive data. Restrict to admins.
+      allow read, write: if isAdmin();
+    }
+
+    // ========================================================================
     // DEFAULT: DENY ALL
     // ========================================================================
     match /{document=**} {

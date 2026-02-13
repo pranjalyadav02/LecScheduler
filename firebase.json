@@ -1,8 +1,16 @@
 {
   "projects": {
-    "default": "YOUR_PROJECT_ID"
+    "default": "lecscheduler-4e36b"
   },
-  "targets": {},
+  "targets": {
+    "lecscheduler-4e36b": {
+      "hosting": {
+        "lecture-scheduler": [
+          "lecscheduler-4e36b"
+        ]
+      }
+    }
+  },
   "hosting": [
     {
       "target": "lecture-scheduler",
@@ -32,5 +40,35 @@
       ],
       "runtime": "nodejs18"
     }
-  ]
+  ],
+  "emulators": {
+    "auth": {
+      "host": "127.0.0.1",
+      "port": 9099
+    },
+    "firestore": {
+      "host": "127.0.0.1",
+      "port": 8080
+    },
+    "functions": {
+      "host": "127.0.0.1",
+      "port": 5001
+    },
+    "hosting": {
+      "host": "127.0.0.1",
+      "port": 5000
+    },
+    "storage": {
+      "host": "127.0.0.1",
+      "port": 4000
+    },
+    "ui": {
+      "enabled": true,
+      "host": "127.0.0.1",
+      "port": 4000
+    },
+    "logging": {
+      "enabled": true
+    }
+  }
 }

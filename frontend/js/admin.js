@@ -454,6 +454,90 @@ function closeNotificationModal() {
 }
 
 // ============================================================================
+// MESSAGE LOG (Simulated SMS/WhatsApp)
+// ============================================================================
+
+async function showMessageLog() {
+    if (!currentSemesterId) {
+        showStatus('lectureStatus', 'Please select a semester', 'warning');
+        return;
+    }
+
+    try {
+        const messages = await db.collection('message_logs')
+            .where('semesterId', '==', currentSemesterId)
+            .orderBy('timestamp', 'desc')
+            .limit(200)
+            .get();
+
+        const listDiv = document.getElementById('messageLogList');
+        listDiv.innerHTML = '';
+
+        if (messages.empty) {
+            listDiv.innerHTML = '<p>No messages logged yet.</p>';
+        } else {
+            const table = document.createElement('table');
+            table.className = 'data-table';
+            table.innerHTML = `
+                <tr>
+                    <th>Date & Time</th>
+                    <th>Enrollment No</th>
+                    <th>Phone</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            `;
+
+            messages.forEach(doc => {
+                const m = doc.data();
+                const row = table.insertRow();
+                const ts = m.timestamp ? new Date(m.timestamp.toDate()).toLocaleString() : '—';
+                row.innerHTML = `
+                    <td>${ts}</td>
+                    <td>${m.enrollment_no || '—'}</td>
+                    <td>${m.phone || '—'}</td>
+                    <td>${m.message_type || '—'}</td>
+                    <td>${m.status || '—'}</td>
+                    <td><button class="primary-btn" onclick='showMessageDetails(${JSON.stringify(m).replace(/'/g, "\\'")})'>View</button></td>
+                `;
+            });
+
+            listDiv.appendChild(table);
+        }
+
+        document.getElementById('messageLogModal').style.display = 'block';
+    } catch (error) {
+        showError(`Error loading message log: ${error.message}`);
+    }
+}
+
+function closeMessageLog() {
+    document.getElementById('messageLogModal').style.display = 'none';
+}
+
+function showMessageDetails(message) {
+    const detailsDiv = document.getElementById('messageDetails');
+    const ts = message.timestamp ? new Date(message.timestamp.toDate()).toLocaleString() : '—';
+
+    detailsDiv.innerHTML = `
+        <p><strong>To:</strong> ${message.phone || '—'}</p>
+        <p><strong>Enrollment:</strong> ${message.enrollment_no || '—'}</p>
+        <p><strong>Type:</strong> ${message.message_type || '—'}</p>
+        <p><strong>Timestamp:</strong> ${ts}</p>
+        <hr>
+        <pre style="white-space:pre-wrap;">${message.message_body || ''}</pre>
+        <p><strong>Status:</strong> ${message.status || '—'}</p>
+    `;
+
+    document.getElementById('messageDetailsModal').style.display = 'block';
+}
+
+function closeMessageDetails() {
+    document.getElementById('messageDetailsModal').style.display = 'none';
+}
+
+// ============================================================================
 // SEMESTER ARCHIVING
 // ============================================================================
 

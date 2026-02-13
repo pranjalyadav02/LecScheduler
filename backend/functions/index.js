@@ -54,7 +54,7 @@ exports.createStudentAuth = functions.https.onCall(async (data, context) => {
     });
 
     // Send credentials via SMS or WhatsApp (mock for now)
-    await deliverCredentials(phone, enrollmentNo, password, 'sms');
+    await deliverCredentials(phone, enrollmentNo, password, semesterId, 'sms');
 
     return {
       success: true,
@@ -464,17 +464,37 @@ async function notifyUsers(semesterId, message, type) {
 }
 
 /**
- * Deliver credentials via SMS or WhatsApp (mock).
+ * Deliver credentials via SMS or WhatsApp (simulated delivery).
+ * Records the message in Firestore `message_logs` collection so admins can audit deliveries.
  */
-async function deliverCredentials(phone, enrollmentNo, password, method) {
+async function deliverCredentials(phone, enrollmentNo, password, semesterId, method = 'sms') {
   console.log(`MOCK ${method.toUpperCase()}: Sending credentials to ${phone}`);
   console.log(`Enrollment: ${enrollmentNo}, Password: ${password}`);
 
-  // TODO: Integrate with Twilio (SMS) or WhatsApp Business API
-  // For now, log to Firebase Functions logs
+  // Compose message body
+  const messageBody = `Your LecScheduler account\nUsername: ${enrollmentNo}\nPassword: ${password}\nPlease login and change your password.`;
 
-  return true;
-}
+  // Save simulated delivery to Firestore (admin-only collection)
+  try {
+    await db.collection('message_logs').add({
+      semesterId: semesterId || null,
+      enrollment_no: enrollmentNo,
+      phone: phone,
+      message_type: 'LOGIN_CREDENTIALS',
+      message_body: messageBody,
+      status: 'SENT',
+      delivery_method: method,
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    console.log(`MESSAGE LOGGED for ${enrollmentNo} (${phone})`);
+    return true;
+  } catch (err) {
+    console.error('Failed to write message log:', err);
+    // Fallback to console log but do not block account creation
+    return false;
+  }
+} 
 
 /**
  * Fetch responses from Google Form (Google Sheets).
