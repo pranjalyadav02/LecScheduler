@@ -35,6 +35,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 currentSemesterId = semesters[0];
                 await loadSemesterInfo();
                 await loadMyLecturesForSelect();
+                await loadSubjectsForChat();
+                await loadMessageRequests();
             } else {
                 showError('No semester assigned to you.');
             }
@@ -273,6 +275,160 @@ async function handleFacultyAnnouncement(event) {
     } catch (error) {
         showStatus('facultyAnnouncementStatus', `Failed: ${error.message}`, 'error');
     }
+}
+
+// ============================================================================
+// SUBJECT CHAT
+// ============================================================================
+
+async function loadSubjectsForChat() {
+    try {
+        const lectures = await db.collection('semesters').doc(currentSemesterId)
+            .collection('lectures')
+            .where('faculty', '==', currentFacultyId)
+            .get();
+
+        const select = document.getElementById('chatSubjectSelect');
+        if (!select) return;
+
+        const subjects = [...new Set(lectures.docs.map(doc => doc.data().subject))].sort();
+        
+        const currentVal = select.value;
+        select.innerHTML = '<option value="">-- Select Subject --</option>';
+        subjects.forEach(subject => {
+            const opt = document.createElement('option');
+            opt.value = subject;
+            opt.textContent = subject;
+            if (subject === currentVal) opt.selected = true;
+            select.appendChild(opt);
+        });
+
+        // If a subject is selected, start real-time listener for messages
+        if (currentVal) {
+            const messagesDiv = document.getElementById('subjectChatMessages');
+            db.collection('semesters').doc(currentSemesterId)
+                .collection('subjects').doc(currentVal)
+                .collection('chat')
+                .orderBy('timestamp', 'asc')
+                .limitToLast(50)
+                .onSnapshot(snapshot => {
+                    messagesDiv.innerHTML = '';
+                    if (snapshot.empty) {
+                        messagesDiv.innerHTML = '<p class="empty-message">No messages yet.</p>';
+                    } else {
+                        snapshot.forEach(doc => {
+                            const msg = doc.data();
+                            const item = document.createElement('div');
+                            item.className = `chat-message ${msg.senderRole === 'faculty' ? 'staff' : 'student'}`;
+                            const time = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString() : '--';
+                            
+                            item.innerHTML = `
+                                <div class="message-header">
+                                    <strong>${msg.senderName}</strong> <small>${time}</small>
+                                </div>
+                                <div class="message-body">${escapeHtml(msg.message)}</div>
+                            `;
+                            messagesDiv.appendChild(item);
+                        });
+                        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                    }
+                });
+        }
+    } catch (error) {
+        console.error('Error loading subjects for chat:', error);
+    }
+}
+
+async function handleSendSubjectMessage(event) {
+    event.preventDefault();
+
+    const subjectName = document.getElementById('chatSubjectSelect').value;
+    const message = document.getElementById('subjectChatMessage').value.trim();
+
+    if (!subjectName || !message) {
+        showStatus('subjectChatStatus', 'Please select a subject and enter a message', 'warning');
+        return;
+    }
+
+    try {
+        showStatus('subjectChatStatus', 'Sending message...', 'info');
+
+        const sendSubjectMessage = functions.httpsCallable('sendSubjectMessage');
+        const result = await sendSubjectMessage({
+            semesterId: currentSemesterId,
+            subjectName: subjectName,
+            message: message,
+        });
+
+        if (result.data.success) {
+            showStatus('subjectChatStatus', '✓ Message sent to subject group.', 'success');
+            document.getElementById('subjectChatMessage').value = '';
+        } else {
+            showStatus('subjectChatStatus', `Error: ${result.data.message}`, 'error');
+        }
+    } catch (error) {
+        showStatus('subjectChatStatus', `Failed: ${error.message}`, 'error');
+    }
+}
+
+async function loadMessageRequests() {
+    try {
+        showStatus('messageRequestsStatus', 'Loading requests...', 'info');
+
+        db.collection('semesters').doc(currentSemesterId)
+            .collection('faculty').doc(currentFacultyId)
+            .collection('message_requests')
+            .orderBy('timestamp', 'desc')
+            .onSnapshot(snapshot => {
+                const listDiv = document.getElementById('messageRequestsList');
+                listDiv.innerHTML = '';
+
+                if (snapshot.empty) {
+                    listDiv.innerHTML = '<p class="empty-message">No pending requests.</p>';
+                    showStatus('messageRequestsStatus', 'No requests', 'info');
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const req = doc.data();
+                    const item = document.createElement('div');
+                    item.className = 'notification-item';
+                    const time = req.timestamp ? new Date(req.timestamp.toDate()).toLocaleString() : '--';
+
+                    item.innerHTML = `
+                        <div class="notification-header">
+                            <strong>📩 From: ${req.senderName}</strong>
+                            <small>${time}</small>
+                        </div>
+                        <div class="notification-body">
+                            ${escapeHtml(req.message)}
+                        </div>
+                        <div class="notification-actions" style="margin-top: 10px;">
+                            <button class="primary-btn small" onclick="replyToStudent('${req.senderId}', '${req.senderName}')">Reply</button>
+                        </div>
+                    `;
+                    listDiv.appendChild(item);
+                });
+                showStatus('messageRequestsStatus', '✓ Updated', 'success');
+            });
+    } catch (error) {
+        showStatus('messageRequestsStatus', `Error: ${error.message}`, 'error');
+    }
+}
+
+function replyToStudent(studentId, studentName) {
+    // For now, we can just alert or open a prompt. 
+    // In a full implementation, this could open a direct chat.
+    const reply = prompt(`Reply to ${studentName}:`);
+    if (reply) {
+        alert("Personal replies feature coming soon! For now, use the Subject Chat to address group concerns.");
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // ============================================================================

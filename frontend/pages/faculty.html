@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lecture Scheduler - Faculty Portal</title>
     <link rel="stylesheet" href="../css/faculty.css">
 </head>
+
 <body>
+    <noscript>
+        <div class="status-message warning" style="display:block;">
+            JavaScript is required for Lecture Scheduler. Please enable it in your browser.
+        </div>
+    </noscript>
     <div class="faculty-container">
         <!-- Header -->
         <header class="faculty-header">
@@ -71,21 +78,35 @@
                 <div id="rescheduleStatus" class="status-message"></div>
             </div>
 
-            <!-- 4. Send Announcement -->
+            <!-- 5. Subject Chat (Now with visibility) -->
             <div class="action-card">
-                <h2>📢 Announce to Students</h2>
-                <p>Send notice about lectures or classes to all students.</p>
-                <form onsubmit="handleFacultyAnnouncement(event)">
-                    <input type="text" id="facultyAnnouncementTitle" placeholder="Title" required>
-                    <textarea id="facultyAnnouncementMsg" placeholder="Message" required rows="4"></textarea>
-                    <button type="submit" class="primary-btn">Send Announcement</button>
+                <h2>💬 Subject Chat</h2>
+                <p>Chat with students in a specific subject group.</p>
+                <div id="subjectChatMessages" class="chat-messages" style="height: 200px; overflow-y: auto; margin-bottom: 15px; border: 1px solid #ddd; padding: 10px; border-radius: 8px;">
+                    <!-- Messages populated here -->
+                    <p class="empty-message">Select a subject to see messages.</p>
+                </div>
+                <form onsubmit="handleSendSubjectMessage(event)">
+                    <select id="chatSubjectSelect" required aria-label="Select subject for chat" onchange="loadSubjectsForChat()">
+                        <option value="">-- Select Subject --</option>
+                    </select>
+                    <textarea id="subjectChatMessage" placeholder="Message to group..." required rows="2"></textarea>
+                    <button type="submit" class="primary-btn">Send to Group</button>
                 </form>
-                <div id="facultyAnnouncementStatus" class="status-message"></div>
+                <div id="subjectChatStatus" class="status-message"></div>
             </div>
 
-            <!-- 5. Attendance (Optional) -->
+            <!-- 6. Message Requests -->
             <div class="action-card">
-                <h2>📊 Lecture History</h2>
+                <h2>📩 Message Requests</h2>
+                <p>Personal messages from students.</p>
+                <div id="messageRequestsList" class="notifications-list" style="max-height: 250px; overflow-y: auto;">
+                    <p class="empty-message">No pending requests.</p>
+                </div>
+                <div id="messageRequestsStatus" class="status-message"></div>
+            </div>
+
+            <!-- 7. Lecture History -->
                 <p>View past lectures and any changes made.</p>
                 <button class="primary-btn" onclick="showLectureHistory()">View History</button>
             </div>
@@ -114,11 +135,13 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-functions.js"></script>
-    <script src="../js/firebase-config.js"></script>
-    <script src="../js/faculty.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-functions-compat.js" defer></script>
+    <script src="../js/firebase-config.js" defer></script>
+    <script src="../js/common.js" defer></script>
+    <script src="../js/faculty.js" defer></script>
 </body>
+
 </html>

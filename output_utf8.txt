@@ -1,0 +1,177 @@
+﻿[dotenv@17.3.1] injecting env (2) from .env.local -- tip: ΓÜÖ∩╕Å  specify custom .env file path with { path: '/custom/path/.env' }
+================================================================================
+TESTING TIMETABLE PARSER
+================================================================================
+
+Original text length: 8693, Cleaned length: 6607
+Attempting parse with model: gemini-1.5-flash
+node : Model 
+gemini-1.5-flash failed: 
+[GoogleGenerativeAI 
+Error]: Error fetching 
+from https://generativelang
+uage.googleapis.com/v1beta/
+models/gemini-1.5-flash:gen
+erateContent: [404 Not 
+Found] 
+models/gemini-1.5-flash is 
+not found for API version 
+v1beta, or is not 
+supported for 
+generateContent. Call 
+ListModels to see the list 
+of available models and 
+their supported methods.
+At line:1 char:1
++ node test_parser.js > 
+output.txt 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (Mod  
+  el gemini-1....ported    
+ methods.:String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+Attempting parse with model: gemini-2.0-flash
+Model gemini-2.0-flash 
+failed: 
+[GoogleGenerativeAI 
+Error]: Error fetching 
+from https://generativelang
+uage.googleapis.com/v1beta/
+models/gemini-2.0-flash:gen
+erateContent: [429 Too 
+Many Requests] You 
+exceeded your current 
+quota, please check your 
+plan and billing details. 
+For more information on 
+this error, head to: https:
+//ai.google.dev/gemini-api/
+docs/rate-limits. To 
+monitor your current 
+usage, head to: 
+https://ai.dev/rate-limit. 
+* Quota exceeded for 
+metric: generativelanguage.
+googleapis.com/generate_con
+tent_free_tier_input_token_
+count, limit: 0, model: 
+gemini-2.0-flash
+* Quota exceeded for 
+metric: generativelanguage.
+googleapis.com/generate_con
+tent_free_tier_requests, 
+limit: 0, model: 
+gemini-2.0-flash
+* Quota exceeded for 
+metric: generativelanguage.
+googleapis.com/generate_con
+tent_free_tier_requests, 
+limit: 0, model: 
+gemini-2.0-flash
+Please retry in 
+31.132067087s. [{"@type":"t
+ype.googleapis.com/google.r
+pc.Help","links":[{"descrip
+tion":"Learn more about 
+Gemini API quotas","url":"h
+ttps://ai.google.dev/gemini
+-api/docs/rate-limits"}]},{
+"@type":"type.googleapis.co
+m/google.rpc.QuotaFailure",
+"violations":[{"quotaMetric
+":"generativelanguage.googl
+eapis.com/generate_content_
+free_tier_input_token_count
+","quotaId":"GenerateConten
+tInputTokensPerModelPerMinu
+te-FreeTier","quotaDimensio
+ns":{"model":"gemini-2.0-fl
+ash","location":"global"}},
+{"quotaMetric":"generativel
+anguage.googleapis.com/gene
+rate_content_free_tier_requ
+ests","quotaId":"GenerateRe
+questsPerMinutePerProjectPe
+rModel-FreeTier","quotaDime
+nsions":{"location":"global
+","model":"gemini-2.0-flash
+"}},{"quotaMetric":"generat
+ivelanguage.googleapis.com/
+generate_content_free_tier_
+requests","quotaId":"Genera
+teRequestsPerDayPerProjectP
+erModel-FreeTier","quotaDim
+ensions":{"model":"gemini-2
+.0-flash","location":"globa
+l"}}]},{"@type":"type.googl
+eapis.com/google.rpc.RetryI
+nfo","retryDelay":"31s"}]
+Attempting parse with model: gemini-1.5-pro
+Model gemini-1.5-pro 
+failed: 
+[GoogleGenerativeAI 
+Error]: Error fetching 
+from https://generativelang
+uage.googleapis.com/v1beta/
+models/gemini-1.5-pro:gener
+ateContent: [404 Not 
+Found] 
+models/gemini-1.5-pro is 
+not found for API version 
+v1beta, or is not 
+supported for 
+generateContent. Call 
+ListModels to see the list 
+of available models and 
+their supported methods.
+Error running parser: Googl
+eGenerativeAIFetchError: 
+[GoogleGenerativeAI 
+Error]: Error fetching 
+from https://generativelang
+uage.googleapis.com/v1beta/
+models/gemini-1.5-pro:gener
+ateContent: [404 Not 
+Found] 
+models/gemini-1.5-pro is 
+not found for API version 
+v1beta, or is not 
+supported for 
+generateContent. Call 
+ListModels to see the list 
+of available models and 
+their supported methods.
+    at handleResponseNotOk 
+(C:\Users\omen\LecScheduler
+\node_modules\@google\gener
+ative-ai\dist\index.js:434:
+11)
+    at process.processTicks
+AndRejections (node:interna
+l/process/task_queues:105:5
+)
+    at async makeRequest (C
+:\Users\omen\LecScheduler\n
+ode_modules\@google\generat
+ive-ai\dist\index.js:403:9)
+    at async 
+generateContent (C:\Users\o
+men\LecScheduler\node_modul
+es\@google\generative-ai\di
+st\index.js:867:22)
+    at async 
+parseTimetableWithGemini (C
+:\Users\omen\LecScheduler\t
+est_parser.js:299:32)
+    at async C:\Users\omen\
+LecScheduler\test_parser.js
+:227:26 {
+  status: 404,
+  statusText: 'Not Found',
+  errorDetails: undefined
+}

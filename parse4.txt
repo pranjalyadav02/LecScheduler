@@ -1,0 +1,79 @@
+﻿[dotenv@17.3.1] injecting env (2) from .env.local -- tip: ≡ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit
+================================================================================
+TESTING TIMETABLE PARSER
+================================================================================
+
+[Gemini] Text ready: original=8693 chars, cleaned=6607 chars
+Attempting parse with model: gemini-2.5-flash
+================================================================================
+Γ£ô TOTAL LECTURES EXTRACTED: 198
+================================================================================
+
+Sample lecture (first entry):
+{
+  "day": "MON",
+  "startTime": "11:00",
+  "endTime": "13:00",
+  "subjectCode": "IC-209D",
+  "subjectName": "Oops Lab using C++ (Lab1)",
+  "faculty": "Mr. Dheeraj Upadhayay",
+  "room": "201",
+  "type": "Lab"
+}
+
+Lectures by Code/Room:
+  201 - IC-209D: 2 lectures
+  201 - IC-202C: 4 lectures
+  201 - IC-204B: 4 lectures
+  201 - IC-206D: 4 lectures
+  201 - IC-201: 4 lectures
+  201 - IC-205C: 4 lectures
+  201 - IC-210E: 4 lectures
+  202 - IC-202C: 4 lectures
+  202 - IC-205C: 4 lectures
+  202 - IC-201: 4 lectures
+  202 - IC-206D: 4 lectures
+  202 - IC-209D: 4 lectures
+  202 - IC-204B: 4 lectures
+  202 - IC-210E: 4 lectures
+  203 - IC-408C: 2 lectures
+  203 - IC-405A: 4 lectures
+  203 - IC-402A: 4 lectures
+  203 - IC-401C: 4 lectures
+  203 - IC-403D: 4 lectures
+  203 - IC-406D: 4 lectures
+  203 - IC-411C: 2 lectures
+  204 - IC-402A: 4 lectures
+  204 - IC-403D: 4 lectures
+  204 - IC-411C: 4 lectures
+  204 - IC-408C: 2 lectures
+  204 - IC-405A: 4 lectures
+  204 - IC-401C: 4 lectures
+  204 - IC-406D: 4 lectures
+  201 - IC-601A: 4 lectures
+  201 - IC-612A: 4 lectures
+  201 - IC-604: 4 lectures
+  201 - IC-609A: 2 lectures
+  201 - IC-611A: 4 lectures
+  202 - IC-604: 4 lectures
+  202 - IC-611A: 4 lectures
+  202 - IC-605: 2 lectures
+  202 - IC-612A: 4 lectures
+  202 - IC-609A: 4 lectures
+  202 - IC-601A: 2 lectures
+  203 - IC-802B: 4 lectures
+  203 - IC-812: 4 lectures
+  207 - IC-811B: 4 lectures
+  203 - IC-810D: 4 lectures
+  203 - IC-801B: 4 lectures
+  207 - IC-812A: 2 lectures
+  203 - IC-813: 4 lectures
+  203 - IC-812A: 2 lectures
+  204 - IC-810D: 4 lectures
+  204 - IC-801B: 4 lectures
+  208 - IC-802B: 4 lectures
+  204 - IC-813: 4 lectures
+  204 - IC-812: 4 lectures
+  204 - IC-812A: 4 lectures
+  208 - IC-811B: 2 lectures
+  204 - IC-811B: 2 lectures

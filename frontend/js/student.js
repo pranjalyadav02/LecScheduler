@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // TAB NAVIGATION
 // ============================================================================
 
-function switchTab(tabName) {
+function switchTab(tabName, evt) {
     // Hide all tabs
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active');
@@ -68,12 +68,17 @@ function switchTab(tabName) {
 
     // Show selected tab
     document.getElementById(tabName).classList.add('active');
-    event.target.classList.add('active');
+    if (evt && evt.currentTarget) {
+        evt.currentTarget.classList.add('active');
+    }
 
     // Refresh data if needed
     if (tabName === 'timetable') loadTimetable();
     if (tabName === 'notifications') loadNotifications();
-    if (tabName === 'chat') loadChatMessages();
+    if (tabName === 'chat') {
+        loadSubjectsForChat();
+        loadChatMessages();
+    }
 }
 
 // ============================================================================
@@ -273,91 +278,188 @@ function getNotificationIcon(type) {
 }
 
 // ============================================================================
-// TAB 3: CHAT (READ-ONLY for students, limited posting)
+// TAB 3: CHAT (Subject-Based)
 // ============================================================================
 
-async function loadChatMessages() {
+function loadSubjectsForChat() {
+    const select = document.getElementById('chatSubjectSelect');
+    if (!select) return;
+
+    // Get unique subjects from cached timetable
+    const subjects = [...new Set(cachedTimetable.map(l => l.subject))].sort();
+
+    // Preserve selection if possible
+    const currentVal = select.value;
+    select.innerHTML = '<option value="">-- Select Subject --</option>';
+
+    subjects.forEach(subject => {
+        const opt = document.createElement('option');
+        opt.value = subject;
+        opt.textContent = subject;
+        if (subject === currentVal) opt.selected = true;
+        select.appendChild(opt);
+    });
+}
+
+function loadChatMessages() {
+    const subjectName = document.getElementById('chatSubjectSelect').value;
+    const messagesDiv = document.getElementById('chatMessages');
+
+    if (!subjectName) {
+        messagesDiv.innerHTML = '<p class="empty-message">Please select a subject to view chat.</p>';
+        showStatus('chatStatus', 'No subject selected', 'info');
+        return;
+    }
+
     try {
         showStatus('chatStatus', 'Loading chat...', 'info');
 
-        const messages = await db.collection('semesters').doc(currentSemesterId)
+        // Listen for messages in real-time
+        db.collection('semesters').doc(currentSemesterId)
+            .collection('subjects').doc(subjectName)
             .collection('chat')
-            .collection('messages')
-            .where('isArchived', '!=', true)
-            .orderBy('isArchived')
-            .orderBy('timestamp', 'desc')
-            .limit(100)
-            .get();
+            .orderBy('timestamp', 'asc')
+            .limitToLast(100)
+            .onSnapshot(snapshot => {
+                messagesDiv.innerHTML = '';
+                if (snapshot.empty) {
+                    messagesDiv.innerHTML = '<p class="empty-message">No messages yet. Be the first to post!</p>';
+                } else {
+                    snapshot.forEach(doc => {
+                        const msg = doc.data();
+                        const item = document.createElement('div');
+                        item.className = `chat-message ${msg.senderRole === 'student' ? 'student' : 'staff'}`;
+                        
+                        const timestamp = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleString() : '--';
 
-        const messagesDiv = document.getElementById('chatMessages');
-        messagesDiv.innerHTML = '';
+                        item.innerHTML = `
+                            <div class="message-header">
+                                <strong>${msg.senderName}</strong>
+                                <span class="message-role">${msg.senderRole}</span>
+                                <small>${timestamp}</small>
+                            </div>
+                            <div class="message-body">${escapeHtml(msg.message)}</div>
+                        `;
+                        messagesDiv.appendChild(item);
+                    });
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                }
+                showStatus('chatStatus', '✓ Chat updated', 'success');
+            }, error => {
+                showStatus('chatStatus', `Error: ${error.message}`, 'error');
+            });
 
-        if (messages.empty) {
-            messagesDiv.innerHTML = '<p class="empty-message">No messages yet. Be the first to post!</p>';
-            showStatus('chatStatus', 'Chat is empty', 'info');
-            return;
-        }
-
-        // Reverse to show oldest first
-        const msgs = messages.docs.reverse();
-        msgs.forEach(doc => {
-            const msg = doc.data();
-            const item = document.createElement('div');
-            item.className = `chat-message ${msg.senderRole === 'student' ? 'student' : 'staff'}`;
-            
-            const timestamp = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleString() : '--';
-
-            item.innerHTML = `
-                <div class="message-header">
-                    <strong>${msg.senderName}</strong>
-                    <span class="message-role">${msg.senderRole}</span>
-                    <small>${timestamp}</small>
-                </div>
-                <div class="message-body">${escapeHtml(msg.message)}</div>
-            `;
-            messagesDiv.appendChild(item);
-        });
-
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        showStatus('chatStatus', '✓ Chat loaded', 'success');
     } catch (error) {
         showStatus('chatStatus', `Error: ${error.message}`, 'error');
+    }
+}
+
+async function openContactModal() {
+    const modal = document.getElementById('contactModal');
+    const select = document.getElementById('contactFacultySelect');
+    if (!modal || !select) return;
+
+    try {
+        select.innerHTML = '<option value="">-- Loading Faculty --</option>';
+        modal.style.display = 'block';
+
+        // Fetch faculty for this semester
+        const facultyList = await db.collection('users')
+            .where('role', '==', 'faculty')
+            .where('semesters', 'array-contains', currentSemesterId)
+            .get();
+
+        select.innerHTML = '<option value="">-- Select Faculty --</option>';
+        facultyList.forEach(doc => {
+            const data = doc.data();
+            const opt = document.createElement('option');
+            opt.value = doc.id;
+            opt.textContent = data.displayName || data.name || 'Unknown Faculty';
+            select.appendChild(opt);
+        });
+
+        if (facultyList.empty) {
+            select.innerHTML = '<option value="">No faculty found</option>';
+        }
+    } catch (error) {
+        console.error('Error loading faculty list:', error);
+        showStatus('personalMessageStatus', 'Error loading faculty', 'error');
+    }
+}
+
+function closeContactModal() {
+    document.getElementById('contactModal').style.display = 'none';
+}
+
+async function handleSendPersonalMessage(event) {
+    event.preventDefault();
+
+    const facultyId = document.getElementById('contactFacultySelect').value;
+    const messageText = document.getElementById('personalMessageInput').value.trim();
+
+    if (!facultyId || !messageText) {
+        showStatus('personalMessageStatus', 'Please select faculty and enter message', 'warning');
+        return;
+    }
+
+    try {
+        showStatus('personalMessageStatus', 'Sending request...', 'info');
+
+        const sendPersonalMessage = window.firebase.functions().httpsCallable('sendPersonalMessage');
+        const result = await sendPersonalMessage({
+            semesterId: currentSemesterId,
+            facultyId: facultyId,
+            message: messageText
+        });
+
+        if (result.data.success) {
+            showStatus('personalMessageStatus', '✓ Message request sent.', 'success');
+            document.getElementById('personalMessageInput').value = '';
+            setTimeout(() => {
+                closeContactModal();
+                showStatus('personalMessageStatus', '', '');
+            }, 2000);
+        } else {
+            showStatus('personalMessageStatus', `Error: ${result.data.message}`, 'error');
+        }
+    } catch (error) {
+        showStatus('personalMessageStatus', `Failed: ${error.message}`, 'error');
     }
 }
 
 async function handleSendMessage(event) {
     event.preventDefault();
 
+    const subjectName = document.getElementById('chatSubjectSelect').value;
     const messageText = document.getElementById('messageInput').value.trim();
-    if (!messageText) {
-        showStatus('chatStatus', 'Message cannot be empty', 'warning');
+
+    if (!subjectName) {
+        showStatus('chatStatus', 'Please select a subject first', 'warning');
         return;
     }
 
-    if (messageText.length > 500) {
-        showStatus('chatStatus', 'Message too long (max 500 characters)', 'error');
+    if (!messageText) {
+        showStatus('chatStatus', 'Message cannot be empty', 'warning');
         return;
     }
 
     try {
         showStatus('chatStatus', 'Sending message...', 'info');
 
-        const user = auth.currentUser;
-        await db.collection('semesters').doc(currentSemesterId)
-            .collection('chat')
-            .collection('messages')
-            .add({
-                sender: user.uid,
-                senderName: user.displayName || 'Anonymous',
-                senderRole: 'student',
-                message: messageText,
-                timestamp: new Date(),
-                isArchived: false,
-            });
+        // Use the new subject-specific Cloud Function
+        const sendSubjectMessage = window.firebase.functions().httpsCallable('sendSubjectMessage');
+        const result = await sendSubjectMessage({
+            semesterId: currentSemesterId,
+            subjectName: subjectName,
+            message: messageText
+        });
 
-        document.getElementById('messageInput').value = '';
-        showStatus('chatStatus', '✓ Message sent', 'success');
-        await loadChatMessages();
+        if (result.data.success) {
+            document.getElementById('messageInput').value = '';
+            showStatus('chatStatus', '✓ Message sent', 'success');
+        } else {
+            showStatus('chatStatus', `Error: ${result.data.message}`, 'error');
+        }
     } catch (error) {
         showStatus('chatStatus', `Failed to send: ${error.message}`, 'error');
     }

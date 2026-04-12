@@ -40,3 +40,5 @@ Thumbs.db
 # Sensitive data
 credentials.json
 service-account-key.json
+.vercel
+.env*.local

@@ -153,7 +153,7 @@ async function seedTestData() {
     }
 
     console.log('🌱 Starting seed data creation...\n');
-    
+
     try {
         // =====================================================================
         // 1. CREATE ADMIN USER
@@ -195,13 +195,7 @@ async function seedTestData() {
             console.warn('Admin auth not available; creating admin profile document with fixed uid "admin-seed"');
             adminUser = { uid: 'admin-seed' };
         }
-        
-        // Get current user
-        const adminUser = auth.currentUser;
-        if (!adminUser) {
-            throw new Error('Could not get admin user');
-        }
-        
+
         // =====================================================================
         // 2. CREATE ADMIN PROFILE IN FIRESTORE
         // =====================================================================
@@ -216,7 +210,7 @@ async function seedTestData() {
             createdAt: new Date(),
         }, { merge: true });
         console.log('✓ Admin profile created');
-        
+
         // =====================================================================
         // 3. CREATE TEST SEMESTER
         // =====================================================================
@@ -230,7 +224,7 @@ async function seedTestData() {
             createdAt: new Date(),
         }, { merge: true });
         console.log('✓ Semester created: sem-2024-s1');
-        
+
         // =====================================================================
         // 4. CREATE SAMPLE FACULTY
         // =====================================================================
@@ -240,7 +234,7 @@ async function seedTestData() {
             { name: 'Prof. Johnson', phone: '+91-9876543211', email: 'johnson@institution.edu' },
             { name: 'Dr. Williams', phone: '+91-9876543212', email: 'williams@institution.edu' },
         ];
-        
+
         for (const faculty of facultyData) {
             await db.collection('semesters').doc('sem-2024-s1')
                 .collection('faculty').add({
@@ -253,7 +247,7 @@ async function seedTestData() {
                 });
         }
         console.log(`✓ ${facultyData.length} faculty members created`);
-        
+
         // =====================================================================
         // 5. CREATE SAMPLE STUDENTS
         // =====================================================================
@@ -265,7 +259,7 @@ async function seedTestData() {
             { enrollmentNo: 'ENG2024004', name: 'David Brown', phone: '+91-9000000004' },
             { enrollmentNo: 'ENG2024005', name: 'Emma Davis', phone: '+91-9000000005' },
         ];
-        
+
         for (const student of studentData) {
             await db.collection('semesters').doc('sem-2024-s1')
                 .collection('students').doc(student.enrollmentNo).set({
@@ -279,7 +273,7 @@ async function seedTestData() {
                 }, { merge: true });
         }
         console.log(`✓ ${studentData.length} students created`);
-        
+
         // =====================================================================
         // 6. CREATE SAMPLE LECTURES
         // =====================================================================
@@ -334,7 +328,7 @@ async function seedTestData() {
                 room: 'Lab 202',
             },
         ];
-        
+
         for (const lecture of lectureData) {
             await db.collection('semesters').doc('sem-2024-s1')
                 .collection('lectures').add({
@@ -351,7 +345,7 @@ async function seedTestData() {
                 });
         }
         console.log(`✓ ${lectureData.length} lectures created`);
-        
+
         // =====================================================================
         // 7. CREATE ADMIN SETTINGS
         // =====================================================================
@@ -364,7 +358,7 @@ async function seedTestData() {
             credentialDeliveryMethod: 'sms',
         }, { merge: true });
         console.log('✓ Admin settings created');
-        
+
         // =====================================================================
         // 8. CREATE SAMPLE MESSAGE LOGS
         // =====================================================================
@@ -401,12 +395,12 @@ async function seedTestData() {
                 timestamp: new Date(),
             },
         ];
-        
+
         for (const log of messageLogs) {
             await db.collection('message_logs').add(log);
         }
         console.log(`✓ ${messageLogs.length} message logs created`);
-        
+
         // =====================================================================
         // SUMMARY
         // =====================================================================
@@ -424,7 +418,7 @@ async function seedTestData() {
         console.log('  Message Logs: 3 samples');
         console.log('\n✨ You can now log in as admin!');
         console.log('='.repeat(60));
-        
+
     } catch (error) {
         console.error('❌ Error seeding data:', error);
         throw error;

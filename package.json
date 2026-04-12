@@ -19,5 +19,16 @@
     "lecture",
     "timetable",
     "firestore"
-  ]
+  ],
+  "dependencies": {
+    "@vercel/analytics": "^1.6.1",
+    "firebase-admin": "^13.6.1"
+  },
+  "engines": {
+    "node": "20.x"
+  },
+  "devDependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "dotenv": "^17.4.0"
+  }
 }

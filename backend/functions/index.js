@@ -340,6 +340,109 @@ exports.syncStudentEnrollments = functions.https.onCall(async (data, context) =>
 });
 
 // ============================================================================
+// 6. SUBJECT-BASED MESSAGING: Send message to specific subject chat
+// ============================================================================
+
+exports.sendSubjectMessage = functions.https.onCall(async (data, context) => {
+  try {
+    const { semesterId, subjectName, message } = data;
+
+    if (!context.auth) {
+      throw new Error('Authentication required.');
+    }
+
+    if (!semesterId || !subjectName || !message) {
+      throw new Error('Missing required fields: semesterId, subjectName, message.');
+    }
+
+    // Get user details
+    const userDoc = await db.collection('users').doc(context.auth.uid).get();
+    if (!userDoc.exists) {
+      throw new Error('User record not found.');
+    }
+    const userData = userDoc.data();
+
+    // Role-based validation
+    if (userData.role === 'student') {
+      // Verify enrollment
+      if (!userData.semesters.includes(semesterId)) {
+        throw new Error('You are not enrolled in this semester.');
+      }
+    } else if (userData.role === 'faculty') {
+      // Verify faculty teaches in this semester
+      if (!userData.semesters.includes(semesterId)) {
+        throw new Error('You are not assigned to this semester.');
+      }
+    } else if (userData.role !== 'admin') {
+      throw new Error('Unauthorized role.');
+    }
+
+    // Write message to subject-specific subcollection
+    const messageData = {
+      sender: context.auth.uid,
+      senderName: userData.name || context.auth.token.name || 'Anonymous',
+      senderRole: userData.role,
+      message: message.trim(),
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      isArchived: false,
+    };
+
+    await db.collection('semesters').doc(semesterId)
+      .collection('subjects').doc(subjectName)
+      .collection('chat').add(messageData);
+
+    return { success: true, message: 'Message sent.' };
+  } catch (error) {
+    console.error('Error in sendSubjectMessage:', error);
+    return { success: false, message: error.message };
+  }
+});
+
+// ============================================================================
+// 7. PERSONAL MESSAGING: Send direct message to faculty
+// ============================================================================
+
+exports.sendPersonalMessage = functions.https.onCall(async (data, context) => {
+  try {
+    const { semesterId, facultyId, message } = data;
+
+    if (!context.auth) {
+      throw new Error('Authentication required.');
+    }
+
+    if (!semesterId || !facultyId || !message) {
+      throw new Error('Missing required fields.');
+    }
+
+    // Get sender details
+    const studentDoc = await db.collection('users').doc(context.auth.uid).get();
+    if (!studentDoc.exists || studentDoc.data().role !== 'student') {
+        throw new Error('Only students can send message requests.');
+    }
+    const studentData = studentDoc.data();
+
+    // Write to faculty's message requests
+    const messageData = {
+      senderId: context.auth.uid,
+      senderName: studentData.name || 'Student',
+      message: message.trim(),
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      status: 'pending', // Message request status
+      semesterId: semesterId
+    };
+
+    await db.collection('semesters').doc(semesterId)
+      .collection('faculty').doc(facultyId)
+      .collection('message_requests').add(messageData);
+
+    return { success: true, message: 'Message request sent.' };
+  } catch (error) {
+    console.error('Error in sendPersonalMessage:', error);
+    return { success: false, message: error.message };
+  }
+});
+
+// ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
 
@@ -529,6 +632,237 @@ async function verifyAdminAccess(uid) {
   }
 }
 
+
+// ============================================================================
+// 8. SUBSTITUTION SYSTEM: Check availability, request, accept/reject
+// ============================================================================
+
+/**
+ * Check if a target faculty member is available in a given time slot.
+ */
+exports.checkSlotAvailability = functions.https.onCall(async (data, context) => {
+  try {
+    const { semesterId, targetFacultyName, day, startTime, endTime } = data;
+
+    if (!semesterId || !targetFacultyName || !day || !startTime || !endTime) {
+      throw new Error('Missing required fields: semesterId, targetFacultyName, day, startTime, endTime.');
+    }
+
+    const lecturesSnap = await db.collection('semesters').doc(semesterId)
+      .collection('lectures')
+      .where('faculty', '==', targetFacultyName)
+      .where('day', '==', day)
+      .get();
+
+    for (const doc of lecturesSnap.docs) {
+      const lec = doc.data();
+      if (lec.status === 'cancelled') continue;
+
+      if (timesOverlap(startTime, endTime, lec.startTime, lec.endTime)) {
+        return {
+          success: true,
+          available: false,
+          conflictingLecture: {
+            id: doc.id,
+            subject: lec.subject,
+            startTime: lec.startTime,
+            endTime: lec.endTime,
+            section: lec.section,
+            room: lec.room,
+          },
+        };
+      }
+    }
+
+    return { success: true, available: true };
+  } catch (error) {
+    console.error('Error checking slot availability:', error);
+    return { success: false, message: error.message };
+  }
+});
+
+/**
+ * Faculty A requests Faculty B to substitute for a specific lecture.
+ */
+exports.requestSubstitution = functions.https.onCall(async (data, context) => {
+  try {
+    const { semesterId, lectureId, targetFacultyId, message } = data;
+
+    if (!context.auth) {
+      throw new Error('Authentication required.');
+    }
+
+    if (!semesterId || !lectureId || !targetFacultyId) {
+      throw new Error('Missing required fields: semesterId, lectureId, targetFacultyId.');
+    }
+
+    const requesterDoc = await db.collection('users').doc(context.auth.uid).get();
+    if (!requesterDoc.exists || requesterDoc.data().role !== 'faculty') {
+      throw new Error('Only faculty members can request substitutions.');
+    }
+    const requester = requesterDoc.data();
+
+    const targetDoc = await db.collection('users').doc(targetFacultyId).get();
+    if (!targetDoc.exists || targetDoc.data().role !== 'faculty') {
+      throw new Error('Target user is not a valid faculty member.');
+    }
+    const target = targetDoc.data();
+
+    const lectureRef = db.collection('semesters').doc(semesterId)
+      .collection('lectures').doc(lectureId);
+    const lectureDoc = await lectureRef.get();
+    if (!lectureDoc.exists) {
+      throw new Error('Lecture not found.');
+    }
+    const lecture = lectureDoc.data();
+
+    if (lecture.faculty !== requester.name) {
+      throw new Error('You can only request substitutions for your own lectures.');
+    }
+
+    const requestRef = await db.collection('semesters').doc(semesterId)
+      .collection('substitution_requests').add({
+        lectureId,
+        lectureSubject: lecture.subject,
+        lectureDay: lecture.day,
+        lectureStartTime: lecture.startTime,
+        lectureEndTime: lecture.endTime,
+        lectureSection: lecture.section || '',
+        lectureRoom: lecture.room || '',
+        requesterId: context.auth.uid,
+        requesterName: requester.name,
+        targetFacultyId,
+        targetFacultyName: target.name,
+        message: message || '',
+        status: 'pending',
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+    await sendNotification(semesterId, {
+      type: 'substitution-request',
+      title: 'Substitution Request',
+      message: `${requester.name} has requested you to take their ${lecture.subject} lecture on ${lecture.day} (${lecture.startTime}-${lecture.endTime}).`,
+      targetUserId: targetFacultyId,
+      requestId: requestRef.id,
+    });
+
+    return {
+      success: true,
+      requestId: requestRef.id,
+      message: `Substitution request sent to ${target.name}.`,
+    };
+  } catch (error) {
+    console.error('Error requesting substitution:', error);
+    return { success: false, message: error.message };
+  }
+});
+
+/**
+ * Target faculty accepts or rejects a substitution request.
+ * On accept: atomically updates the lecture's faculty field.
+ */
+exports.handleSubstitutionResponse = functions.https.onCall(async (data, context) => {
+  try {
+    const { semesterId, requestId, action, rejectionReason } = data;
+
+    if (!context.auth) {
+      throw new Error('Authentication required.');
+    }
+
+    if (!semesterId || !requestId || !['accept', 'reject'].includes(action)) {
+      throw new Error('Missing or invalid fields: semesterId, requestId, action (accept|reject).');
+    }
+
+    const requestRef = db.collection('semesters').doc(semesterId)
+      .collection('substitution_requests').doc(requestId);
+    const requestDoc = await requestRef.get();
+
+    if (!requestDoc.exists) {
+      throw new Error('Substitution request not found.');
+    }
+
+    const request = requestDoc.data();
+
+    if (request.targetFacultyId !== context.auth.uid) {
+      throw new Error('Only the target faculty can respond to this request.');
+    }
+
+    if (request.status !== 'pending') {
+      throw new Error(`This request has already been ${request.status}.`);
+    }
+
+    if (action === 'reject') {
+      await requestRef.update({
+        status: 'rejected',
+        rejectionReason: rejectionReason || 'No reason provided',
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      await sendNotification(semesterId, {
+        type: 'substitution-rejected',
+        title: 'Substitution Rejected',
+        message: `${request.targetFacultyName} declined your ${request.lectureSubject} substitution request.`,
+        targetUserId: request.requesterId,
+        requestId,
+      });
+
+      return { success: true, message: 'Substitution request rejected.' };
+    }
+
+    // ACCEPT — atomic transaction
+    await db.runTransaction(async (transaction) => {
+      const freshRequest = await transaction.get(requestRef);
+      if (freshRequest.data().status !== 'pending') {
+        throw new Error('Request is no longer pending.');
+      }
+
+      const lectureRef = db.collection('semesters').doc(semesterId)
+        .collection('lectures').doc(request.lectureId);
+      const lectureDoc = await transaction.get(lectureRef);
+
+      if (!lectureDoc.exists) {
+        throw new Error('Lecture no longer exists.');
+      }
+
+      const lecture = lectureDoc.data();
+
+      transaction.update(lectureRef, {
+        originalFaculty: lecture.faculty,
+        faculty: request.targetFacultyName,
+        status: 'substituted',
+        substitutionRequestId: requestId,
+        lastModified: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      transaction.update(requestRef, {
+        status: 'accepted',
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    });
+
+    await sendNotification(semesterId, {
+      type: 'substitution-accepted',
+      title: 'Substitution Accepted',
+      message: `${request.targetFacultyName} accepted your ${request.lectureSubject} substitution request.`,
+      targetUserId: request.requesterId,
+      requestId,
+    });
+
+    await sendNotification(semesterId, {
+      type: 'lecture-substituted',
+      title: 'Faculty Change',
+      message: `${request.lectureSubject} on ${request.lectureDay} (${request.lectureStartTime}-${request.lectureEndTime}) will now be taken by ${request.targetFacultyName}.`,
+      affectedLectures: [request.lectureId],
+    });
+
+    return { success: true, message: 'Substitution accepted. Lecture updated.' };
+  } catch (error) {
+    console.error('Error handling substitution response:', error);
+    return { success: false, message: error.message };
+  }
+});
+
 module.exports = {
   createStudentAuth: exports.createStudentAuth,
   processPDFTimetable: exports.processPDFTimetable,
@@ -536,4 +870,10 @@ module.exports = {
   rescheduleLecture: exports.rescheduleLecture,
   sendAnnouncement: exports.sendAnnouncement,
   syncStudentEnrollments: exports.syncStudentEnrollments,
+  sendSubjectMessage: exports.sendSubjectMessage,
+  sendPersonalMessage: exports.sendPersonalMessage,
+  checkSlotAvailability: exports.checkSlotAvailability,
+  requestSubstitution: exports.requestSubstitution,
+  handleSubstitutionResponse: exports.handleSubstitutionResponse,
 };
+

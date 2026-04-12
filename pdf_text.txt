@@ -1,0 +1,486 @@
+
+--- PAGE 1 ---
+INTERNATIONAL  INSTITUTE  OF PROFESSIONAL  STUDIES    
+DEVI AHILYA  UNIVERSITY,  INDORE  
+TENTATIVE  TIME  TABLE  
+Jan-May 202 6 
+ 
+ 
+ MCA SEMESTER II (SECTION –A) 
+                     ROOM -201 
+ 
+ 11:00 -
+1:00 1:00-2:00 2:00-3:00 3:00-4:00 4:00-5:00 
+MON -
+TUE  IC-209D  
+C++ Lab  IC-202C  
+IWP  
+ IC-204B  
+DCO  IC-206D  
+Hindi  IC-201 
+Mathematics -II 
+WED -
+THUR   IC-205C  
+Oops using C++  IC-201 
+Mathe
+matics
+-II IC-206D  
+Hindi  IC-202C  
+IWP 
+FRI-
+SAT   IC-205C  
+Oops Using 
+C++ IC-204B  
+DCO  
+ IC-210E  
+IWP Lab  
+ IC-210E  
+IWP Lab  
+ 
+ 
+ 
+KEYS:  
+ 
+SUB.CODE  SUBJECT  FACULTY  
+IC-205C  Object Oriented Programming Using C++  Ms. Shraddha Soni  
+IC-202C  Internet &  Web programming  Ms. Ragini Modi  
+IC-204B  Digital Computer Organization  Dr. RajeshVerma  
+IC-201 Mathematics –II Mr.Hemant Prakash Gavde  
+IC-206D  Hindi  Dr. Pushpendra Dubey  
+IC-209D  Oops Lab using C++ (Lab1)  Mr. Dheeraj Upadhayay  
+IC-210E  IWP Lab (Lab 2) Mr. Anshul Satle  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Program  Incharge  Director  
+ 
+ 
+ 
+--- PAGE 2 ---
+INTERNATIONAL  INSTITUTE  OF PROFESSIONAL  STUDIES    
+DEVI AHILYA  UNIVERSITY,  INDORE  
+TENTATIVE  TIME  TABLE  
+Jan-May 202 6 
+MCA SEMESTER II  (SECTION –B) 
+                                                                                                                                    ROOM -202 
+ 
+ 11:00 -12:00  12:00 -1:00 1:00-2:00 2:00-3:00 3:00-4:00 4:00-5:00 
+MON -
+TUE    IC-202C  
+IWP IC-205C  
+Oops using  
+C++ Mathem
+atics–II IC-206D  
+Hindi  
+ 
+WED -
+THUR  IC-209D  
+C++Lab  IC-209D  
+C++La b Mathema
+tics–II IC-204B  
+DCO  IC-206D  
+Hindi   
+FRI-
+SAT  IC-210E  
+IWP 
+Lab IC-210E  
+IWP Lab  IC-204B  
+DCO  IC-202C  
+IWP IC-205C  
+Oops using  
+C++  
+ 
+ 
+KEYS:  
+ 
+SUB. CODE  SUBJECT  FACULTY  
+IC-205C  Object Oriented Programming Using C++  Ms. Shraddha Soni  
+IC-202C  Internet &web programming  Ms. Kirti Vijayvergia  
+IC-204B  Digital Computer Organization  Mr Prakshep Goswami  
+IC-201 Mathematics –II Mr.Hemant Prakash Gavde  
+IC-206D  Hindi  Dr. Pushpendra Dubey  
+IC-209D  Oops Lab using C++ (Lab1)  Mr. Dheeraj Upadhayay  
+IC-210E  IWP Lab (Lab1)  Mr. Rajesh Verma  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Program  Incharge  Director  
+--- PAGE 3 ---
+INTERNATIONAL  INSTITUTE  OF PROFESSIONAL  STUDIES    
+DEVI AHILYA  UNIVERSITY,  INDORE  
+TENTATIVE  TIME  TABLE  
+Jan-May 202 6 
+             MCA SEMESTER IV (SECTION –A) 
+ 
+Room No - 203 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+KEYS:  
+ 
+SUB. CODE  SUBJECT  FACULTY  
+IC-403D  Programming with Java  Dr. Nitin Nagar  
+IC-402A  Discrete Mathematics  Dr. Rupesh Sendre  
+IC-405A  Unix OS  Dr. Vivek Shrivastav  
+IC-401C  Data& Computer Communication  Mr. Rajesh Verma  
+IC-406D  Entrepreneurship  Dr. Monalisa Khatre  
+IC-408C  Prog with Java Lab (Lab 2) Mr. Pratham Jaiswal  
+IC-411C  Unix OS Lab (Lab 2) Mr Prakshep Goswami  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Program  Incharge  Director   11:00 -1:00 1:00-2:00 2:00-3:00 3:00-4:00 4:00-5:00 
+MON -
+TUE  IC-408C  
+ Prog . with Java    
+Lab IC-405A  
+Unix   OS  
+ 
+ IC-402A  
+Discrete Maths  IC-401C  
+DCC  
+  
+WED -
+THUR   IC-403D  
+Prog.  With  Java IC-405A  
+Unix  OS IC-401C  
+DCC  
+ IC-405 
+Eship  
+FRI-SAT  Unix OS  Lab IC-402A  
+Discrete  Maths  IC-403D  
+Prog.  With  Java  IC-405 
+E.ship  
+--- PAGE 4 ---
+INTERNATIONAL  INSTITUTE  OF PROFESSIONAL  STUDIES    
+DEVI AHILYA  UNIVERSITY,  INDORE  
+TENTATIVE  TIME  TABLE  
+Jan-May 202 6 
+                   MCA SEMESTER IV (SECTION –B) 
+                                                                                              
+Room No - 204 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+KEYS:  
+ 
+SUB. CODE  SUBJECT  FACULTY  
+IC-403D  Programming with Java  Mr. Pratham Jaiswal  
+IC-402A  Discrete Mathematics  Dr. Nitin Nagar  
+IC-405A  Unix OS  Dr. Vivek Shrivastava  
+IC-401C  Data& Computer Communication  Mr. Rajesh Verma  
+IC-406D  Entrepreneurship  Dr. Monalisa Khatre  
+IC-408C  Prog . with Java Lab ( Lab 2) Mr. Pratham Jaiswal  
+IC-411C  Unix  OS Lab(Lab1)  Mr Prakshep Goswami  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Program  Incharge  Director   11:00 -1:00 1:00-2:00 2:00-3:00 3:00-4:00 4:00-5:00 
+MON -TUE   IC-402A  
+Discrete 
+Maths  IC-403D  
+Prog. With Java  IC-411C  
+Unix OS 
+Lab IC-411C  
+Unix OS Lab  
+WED -THUR  IC-408C  
+Prog . with 
+JavaLab  IC-405A  
+Unix  OS  
+ IC-401C  
+DCC  
+ IC-405 
+Eship  IC-403D  
+Prog. With 
+Java  
+FRI-SAT   IC-402A  
+Discrete Maths  
+  
+ IC-405A  
+Unix  OS 
+ IC-401C  
+DCC   
+ 
+ IC-405 
+Eship  
+--- PAGE 5 ---
+INTERNATIONAL  INSTITUTE  OF PROFESSIONAL  STUDIES    
+DEVI AHILYA  UNIVERSITY,  INDORE  
+TENTATIVE  TIME  TABLE  
+Jan-May 202 6 
+                 MCA SEMESTER VI (SECTION –A) 
+ Room No -201 
+ 
+ 
+ 
+KEYS:  
+ 
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Program  Incharge  Director   8:00-10:00  10:00 -11:00  11:00 -12:00  12:00 -1:00 1:00-3:00 
+MON -
+TUE    IC-602 
+ HCI IC-604 
+OS IC-603 
+SAD  IC-606 
+Android 
+prog. Lab  
+ 
+WED -
+THUR  IC-602 
+HCI  IC-601 
+CC 
+ IC-
+604 
+OS project  
+FRI-SAT     IC-601 
+CC 
+ IC-603 
+SAD    
+SUB.CODE  SUBJECT  FACULTY  
+IC-611A  Intro.to Cloud Computing  Dr. Poonam Mangwani  
+IC-601A  Human Computer Interaction  Dr. Ajay Jaiswal  
+IC-612A  Operating Systems  Dr. Basant Namdeo  
+IC-604 System Analysis& design  Dr. Rahul Singhai  
+IC-609A  Android Programming lab (Lab1)  Mr. Dheeraj Upadhayay  
+IC-605 Project   
+--- PAGE 6 ---
+INTERNATIONAL  INSTITUTE  OF PROFESSIONAL  STUDIES    
+DEVI AHILYA  UNIVERSITY,  INDORE  
+TENTATIVE  TIME  TABLE  
+Jan-May 202 6 
+              MCA SEMESTER VI (SECTION –B) 
+ROOM -202 
+ 8:00-10:00 11:00 -12:00  12:00 -1:00 1:00-2.00 2:00-3:00 
+MON -
+TUE   IC-603 
+SAD  IC-601 
+ CC  Project   
+WED -
+THUR    IC-604OS  IC-603 
+SAD  IC-606 
+Android 
+prog.  IC-606 
+Android 
+prog.  
+FRI-SAT  IC-
+602 
+HCI IC-601 
+CC IC-604 
+OS 
+ Project   
+ 
+ 
+KEYS:  
+ 
+SUB.CODE  SUBJECT  FACULTY  
+IC-611A  Intro.to Cloud Computing  Dr Vivek Shrivastava  
+IC-601A  Human Computer Interaction  Dr. Ajay Jaiswal  
+IC-612A  Operating Systems  Dr. Basant Namdeo  
+IC-604 System Analysis& design  Dr. Rahul Singhai  
+IC-609A  Android Programming lab (Lab1)  Mr. Dheeraj Upadhayay  
+IC-605 Project   
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Program  Incharge  Director  
+--- PAGE 7 ---
+INTERNATIONAL  INSTITUTE  OF PROFESSIONAL  STUDIES    
+DEVI AHILYA  UNIVERSITY,  INDORE  
+TENTATIVE  TIME  TABLE  
+Jan-May 2026  
+MCA SEMESTER VIII (SECTION –A) 
+ 
+Room No - 203 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+KEYS:  
+ 
+SUB.CODE  SUBJECT  FACULTY  
+IC-801B  Mobile&  Wireless  Computing  Dr. Manju  Suchdeo  
+IC-812A  Soft Computing  Dr. Jugendra Dongre  
+IC-812 Theory  of Computation  Dr. Yasmin  Shaikh  
+IC-811B  Data  Mining&  Warehousing  Dr. Pradeep Jatav  
+IC-802B  Enterprise  Computing Technique  Dr. Ramesh  Thakur  
+IC-810D  ECT Lab (  Elex Lab   ) Visiting Faculty  
+IC-813 M&WC  Lab( Elex Lab)  
+ Visiting Faculty  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Program  Incharge  Director   9:00- 
+10:00  10:00 - 
+11:00  11:00 -12:00  12:00 -1:00 1.00-2:00 2:00-3:00 
+MON -
+TUE   IC-802B  
+ECT  IC-802B  
+ECT  IC-812  
+TOC  
+ IC-811B 
+DMW  
+(R.No:207)   
+WED -
+THUR  IC-810D  
+ECT 
+Lab IC-810D  
+ECT 
+Lab IC-801B 
+MWC  IC-801B 
+MWC  IC-812 A 
+Soft Comp.    
+(R.No:207)   
+FRI-
+SAT  IC-813 
+MWC 
+Lab IC-813 
+MWC 
+Lab IC-812  
+TOC  
+ IC-812A  
+Soft Comp  IC-811B 
+DMW  
+(R.No:207)   
+--- PAGE 8 ---
+INTERNATIONAL  INSTITUTE  OF PROFESSIONAL  STUDIES    
+DEVI AHILYA  UNIVERSITY,  INDORE  
+TENTATIVE  TIME  TABLE  
+Jan-May 202 6 
+MCA SEMESTER VIII (SECTION –B) 
+ 
+                                
+                          Room No - 204 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+KEYS:  
+ 
+SUB.CODE  SUBJECT  FACULTY  
+IC-801B  Mobile  & Wireless  Computing  Dr. ManjuSuchdeo  
+IC-812A  Soft Computing  Dr. Jugendra Dongre  
+IC-812 Theory  of Computation  Dr. Yasmin  Shaikh  
+IC-811B  Data  Mining  &Warehousing  Dr. Pradeep Jatav  
+IC-802B  Enterprise  Computing Technique  Dr. Ramesh  Thakur  
+IC-810D  ECT Lab (  Elex Lab ) VisitingFaculty  
+IC-813 M&WC Lab(Elex Lab)  VisitingFaculty  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Program  Incharge  Director  
+ 
+ 
+  8:00-10:00  9:00-10:00  10:00 - 
+11:00  11:00 -12:00  12:00 -1:00 1.00-2.00 
+MON -
+TUE   IC-810D  
+ECT Lab  IC-810D  
+ECT 
+Lab IC-801B  
+MWC  IC-801B  
+MWC   IC-802B  
+ECT  
+(R.No:208)  
+WED -
+THUR     IC-813 
+MWC Lab  IC-813 
+MWC 
+Lab IC-812 
+TOC  
+ IC-812 A                        
+Soft Comp.  IC-811B  
+DMW 
+(R.No:208)  
+FRI-
+SAT    IC-812 
+TOC  
+ IC-812 A                       
+Soft Comp.  IC-811B  
+DMW  
+ IC-802B  
+ECT  
+ 
+ (R.No:208)  
