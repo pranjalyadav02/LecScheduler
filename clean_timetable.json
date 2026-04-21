@@ -1,0 +1,462 @@
+[
+  {
+    "day": "MON",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "subjectCode": "IC-209D",
+    "subjectName": "Oops Lab using C++",
+    "faculty": "Mr. Dheeraj Upadhayay",
+    "room": "LAB-1",
+    "type": "Lab"
+  },
+  {
+    "day": "TUE",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "subjectCode": "IC-209D",
+    "subjectName": "Oops Lab using C++",
+    "faculty": "Mr. Dheeraj Upadhayay",
+    "room": "LAB-1",
+    "type": "Lab"
+  },
+  {
+    "day": "MON",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "subjectCode": "IC-202C",
+    "subjectName": "Internet & Web programming",
+    "faculty": "Ms. Ragini Modi",
+    "room": "ROOM-201",
+    "type": "Lecture"
+  },
+  {
+    "day": "TUE",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "subjectCode": "IC-202C",
+    "subjectName": "Internet & Web programming",
+    "faculty": "Ms. Ragini Modi",
+    "room": "ROOM-201",
+    "type": "Lecture"
+  },
+  {
+    "day": "MON",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "subjectCode": "IC-204B",
+    "subjectName": "Digital Computer Organization",
+    "faculty": "Dr. Rajesh Verma",
+    "room": "ROOM-201",
+    "type": "Lecture"
+  },
+  {
+    "day": "TUE",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "subjectCode": "IC-204B",
+    "subjectName": "Digital Computer Organization",
+    "faculty": "Dr. Rajesh Verma",
+    "room": "ROOM-201",
+    "type": "Lecture"
+  },
+  {
+    "day": "MON",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "subjectCode": "IC-206D",
+    "subjectName": "Hindi",
+    "faculty": "Dr. Pushpendra Dubey",
+    "room": "ROOM-201",
+    "type": "Lecture"
+  },
+  {
+    "day": "TUE",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "subjectCode": "IC-206D",
+    "subjectName": "Hindi",
+    "faculty": "Dr. Pushpendra Dubey",
+    "room": "ROOM-201",
+    "type": "Lecture"
+  },
+  {
+    "day": "MON",
+    "startTime": "16:00",
+    "endTime": "17:00",
+    "subjectCode": "IC-201",
+    "subjectName": "Mathematics II",
+    "faculty": "Mr. Hemant Prakash Gavde",
+    "room": "ROOM-201",
+    "type": "Lecture"
+  },
+  {
+    "day": "TUE",
+    "startTime": "16:00",
+    "endTime": "17:00",
+    "subjectCode": "IC-201",
+    "subjectName": "Mathematics II",
+    "faculty": "Mr. Hemant Prakash Gavde",
+    "room": "ROOM-201",
+    "type": "Lecture"
+  },
+  {
+    "day": "WED",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "subjectCode": "IC-205C",
+    "subjectName": "Object Oriented Programming Using C++",
+    "faculty": "Ms. Shraddha Soni",
+    "room": "ROOM-201",
+    "type": "Lecture"
+  },
+  {
+    "day": "THU",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "subjectCode": "IC-205C",
+    "subjectName": "Object Oriented Programming Using C++",
+    "faculty": "Ms. Shraddha Soni",
+    "room": "ROOM-201",
+    "type": "Lecture"
+  },
+  {
+    "day": "WED",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "subjectCode": "IC-201",
+    "subjectName": "Mathematics II",
+    "faculty": "Mr. Hemant Prakash Gavde",
+    "room": "ROOM-201",
+    "type": "Lecture"
+  },
+  {
+    "day": "THU",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "subjectCode": "IC-201",
+    "subjectName": "Mathematics II",
+    "faculty": "Mr. Hemant Prakash Gavde",
+    "room": "ROOM-201",
+    "type": "Lecture"
+  },
+  {
+    "day": "FRI",
+    "startTime": "14:00",
+    "endTime": "16:00",
+    "subjectCode": "IC-210E",
+    "subjectName": "IWP Lab",
+    "faculty": "Mr. Anshul Satle",
+    "room": "LAB-2",
+    "type": "Lab"
+  },
+  {
+    "day": "SAT",
+    "startTime": "14:00",
+    "endTime": "16:00",
+    "subjectCode": "IC-210E",
+    "subjectName": "IWP Lab",
+    "faculty": "Mr. Anshul Satle",
+    "room": "LAB-2",
+    "type": "Lab"
+  },
+  {
+    "day": "MON",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "subjectCode": "IC-202C",
+    "subjectName": "Internet & web programming",
+    "faculty": "Ms. Kirti Vijayvergia",
+    "room": "ROOM-202",
+    "type": "Lecture"
+  },
+  {
+    "day": "TUE",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "subjectCode": "IC-202C",
+    "subjectName": "Internet & web programming",
+    "faculty": "Ms. Kirti Vijayvergia",
+    "room": "ROOM-202",
+    "type": "Lecture"
+  },
+  {
+    "day": "WED",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "subjectCode": "IC-209D",
+    "subjectName": "Oops Lab using C++",
+    "faculty": "Mr. Dheeraj Upadhayay",
+    "room": "LAB-1",
+    "type": "Lab"
+  },
+  {
+    "day": "THU",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "subjectCode": "IC-209D",
+    "subjectName": "Oops Lab using C++",
+    "faculty": "Mr. Dheeraj Upadhayay",
+    "room": "LAB-1",
+    "type": "Lab"
+  },
+  {
+    "day": "MON",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "subjectCode": "IC-408C",
+    "subjectName": "Prog with Java Lab",
+    "faculty": "Mr. Pratham Jaiswal",
+    "room": "LAB-2",
+    "type": "Lab"
+  },
+  {
+    "day": "TUE",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "subjectCode": "IC-408C",
+    "subjectName": "Prog with Java Lab",
+    "faculty": "Mr. Pratham Jaiswal",
+    "room": "LAB-2",
+    "type": "Lab"
+  },
+  {
+    "day": "MON",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "subjectCode": "IC-405A",
+    "subjectName": "Unix OS",
+    "faculty": "Dr. Vivek Shrivastav",
+    "room": "ROOM-203",
+    "type": "Lecture"
+  },
+  {
+    "day": "TUE",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "subjectCode": "IC-405A",
+    "subjectName": "Unix OS",
+    "faculty": "Dr. Vivek Shrivastav",
+    "room": "ROOM-203",
+    "type": "Lecture"
+  },
+  {
+    "day": "MON",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "subjectCode": "IC-402A",
+    "subjectName": "Discrete Mathematics",
+    "faculty": "Dr. Rupesh Sendre",
+    "room": "ROOM-203",
+    "type": "Lecture"
+  },
+  {
+    "day": "MON",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "subjectCode": "IC-401C",
+    "subjectName": "Data& Computer Communication",
+    "faculty": "Mr. Rajesh Verma",
+    "room": "ROOM-203",
+    "type": "Lecture"
+  },
+  {
+    "day": "WED",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "subjectCode": "IC-403D",
+    "subjectName": "Programming with Java",
+    "faculty": "Dr. Nitin Nagar",
+    "room": "ROOM-203",
+    "type": "Lecture"
+  },
+  {
+    "day": "WED",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "subjectCode": "IC-406D",
+    "subjectName": "Entrepreneurship",
+    "faculty": "Dr. Monalisa Khatre",
+    "room": "ROOM-203",
+    "type": "Lecture"
+  },
+  {
+    "day": "FRI",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "subjectCode": "IC-411C",
+    "subjectName": "Unix OS Lab",
+    "faculty": "Mr Prakshep Goswami",
+    "room": "LAB-2",
+    "type": "Lab"
+  },
+  {
+    "day": "SAT",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "subjectCode": "IC-411C",
+    "subjectName": "Unix OS Lab",
+    "faculty": "Mr Prakshep Goswami",
+    "room": "LAB-2",
+    "type": "Lab"
+  },
+  {
+    "day": "MON",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "subjectCode": "IC-402A",
+    "subjectName": "Discrete Mathematics",
+    "faculty": "Dr. Nitin Nagar",
+    "room": "ROOM-204",
+    "type": "Lecture"
+  },
+  {
+    "day": "MON",
+    "startTime": "14:00",
+    "endTime": "16:00",
+    "subjectCode": "IC-411C",
+    "subjectName": "Unix OS Lab",
+    "faculty": "Mr Prakshep Goswami",
+    "room": "LAB-1",
+    "type": "Lab"
+  },
+  {
+    "day": "MON",
+    "startTime": "08:00",
+    "endTime": "10:00",
+    "subjectCode": "IC-601A",
+    "subjectName": "Human Computer Interaction",
+    "faculty": "Dr. Ajay Jaiswal",
+    "room": "ROOM-201",
+    "type": "Lecture"
+  },
+  {
+    "day": "MON",
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "subjectCode": "IC-612A",
+    "subjectName": "Operating Systems",
+    "faculty": "Dr. Basant Namdeo",
+    "room": "ROOM-201",
+    "type": "Lecture"
+  },
+  {
+    "day": "MON",
+    "startTime": "12:00",
+    "endTime": "13:00",
+    "subjectCode": "IC-609A",
+    "subjectName": "Android Programming lab",
+    "faculty": "Mr. Dheeraj Upadhayay",
+    "room": "LAB-1",
+    "type": "Lab"
+  },
+  {
+    "day": "MON",
+    "startTime": "08:00",
+    "endTime": "10:00",
+    "subjectCode": "IC-604",
+    "subjectName": "System Analysis& design",
+    "faculty": "Dr. Rahul Singhai",
+    "room": "ROOM-202",
+    "type": "Lecture"
+  },
+  {
+    "day": "MON",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "subjectCode": "IC-611A",
+    "subjectName": "Intro.to Cloud Computing",
+    "faculty": "Dr Vivek Shrivastava",
+    "room": "ROOM-202",
+    "type": "Lecture"
+  },
+  {
+    "day": "MON",
+    "startTime": "09:00",
+    "endTime": "11:00",
+    "subjectCode": "IC-802B",
+    "subjectName": "Enterprise Computing Technique",
+    "faculty": "Dr. Ramesh Thakur",
+    "room": "ROOM-203",
+    "type": "Lecture"
+  },
+  {
+    "day": "MON",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "subjectCode": "IC-812",
+    "subjectName": "Theory of Computation",
+    "faculty": "Dr. Yasmin Shaikh",
+    "room": "ROOM-203",
+    "type": "Lecture"
+  },
+  {
+    "day": "MON",
+    "startTime": "12:00",
+    "endTime": "13:00",
+    "subjectCode": "IC-811B",
+    "subjectName": "Data Mining& Warehousing",
+    "faculty": "Dr. Pradeep Jatav",
+    "room": "ROOM-207",
+    "type": "Lecture"
+  },
+  {
+    "day": "WED",
+    "startTime": "09:00",
+    "endTime": "11:00",
+    "subjectCode": "IC-810D",
+    "subjectName": "ECT Lab",
+    "faculty": "Visiting Faculty",
+    "room": "ELEX-LAB",
+    "type": "Lab"
+  },
+  {
+    "day": "WED",
+    "startTime": "11:00",
+    "endTime": "13:00",
+    "subjectCode": "IC-801B",
+    "subjectName": "Mobile& Wireless Computing",
+    "faculty": "Dr. Manju Suchdeo",
+    "room": "ROOM-203",
+    "type": "Lecture"
+  },
+  {
+    "day": "FRI",
+    "startTime": "09:00",
+    "endTime": "11:00",
+    "subjectCode": "IC-813",
+    "subjectName": "M&WC Lab",
+    "faculty": "Visiting Faculty",
+    "room": "ELEX-LAB",
+    "type": "Lab"
+  },
+  {
+    "day": "MON",
+    "startTime": "08:00",
+    "endTime": "10:00",
+    "subjectCode": "IC-810D",
+    "subjectName": "ECT Lab",
+    "faculty": "Visiting Faculty",
+    "room": "ELEX-LAB",
+    "type": "Lab"
+  },
+  {
+    "day": "MON",
+    "startTime": "10:00",
+    "endTime": "12:00",
+    "subjectCode": "IC-801B",
+    "subjectName": "Mobile & Wireless Computing",
+    "faculty": "Dr. ManjuSuchdeo",
+    "room": "ROOM-204",
+    "type": "Lecture"
+  },
+  {
+    "day": "MON",
+    "startTime": "12:00",
+    "endTime": "13:00",
+    "subjectCode": "IC-802B",
+    "subjectName": "Enterprise Computing Technique",
+    "faculty": "Dr. Ramesh Thakur",
+    "room": "ROOM-208",
+    "type": "Lecture"
+  }
+]

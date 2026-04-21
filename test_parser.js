@@ -233,6 +233,10 @@ const text = fs.readFileSync(textPath, 'utf8');
         if (lectures.length > 0) {
             console.log('Sample lecture (first entry):');
             console.log(JSON.stringify(lectures[0], null, 2));
+            
+            // Save to JSON for seeding
+            fs.writeFileSync('clean_timetable.json', JSON.stringify(lectures, null, 2));
+            console.log(`\n✅ Saved ${lectures.length} lectures to clean_timetable.json`);
         }
 
         // Group by section
@@ -272,9 +276,10 @@ const text = fs.readFileSync(textPath, 'utf8');
         // Run test_parser_simple.js to discover which models are available for your
         // API key / Google Cloud project, then keep this list in sync.
         const modelsToTry = [
-            "gemini-2.5-flash",          // ← PRIMARY (confirmed working via test_parser_simple)
-            "gemini-2.0-flash",          // fallback – may hit free-tier quota
-            "gemini-1.5-flash",          // legacy alias, may be 404 on some projects
+            "gemini-flash-latest",       // PRIMARY - Latest stable 1.5-flash
+            "gemini-2.5-flash",          // Fallback 1
+            "gemini-2.0-flash",          // Fallback 2
+            "gemini-pro-latest",         // Fallback 3
         ];
         let lastError;
 

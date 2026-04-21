@@ -58,28 +58,7 @@ const NOW = { _serverTimestamp: true };
 
 // ─── TIMETABLE DATA (from PDF) ───────────────────────────────────────────────
 
-const SEMESTERS = [
-    {
-        id: 'mca_semester_ii',
-        name: 'MCA SEMESTER II',
-        programCode: 'MCA',
-        semesterNo: 2,
-        academicYear: 'Jan-May 2026',
-        status: 'active',
-        sections: ['A', 'B'],
-        createdFrom: 'pdf-seed'
-    },
-    {
-        id: 'mca_semester_iv',
-        name: 'MCA SEMESTER IV',
-        programCode: 'MCA',
-        semesterNo: 4,
-        academicYear: 'Jan-May 2026',
-        status: 'active',
-        sections: ['A', 'B'],
-        createdFrom: 'pdf-seed'
-    }
-];
+const SEMESTERS = [ { id: 'mca_semester_ii', name: 'MCA Semester II', year: 2026 }, { id: 'mca_semester_iv', name: 'MCA Semester IV', year: 2026 }, { id: 'mca_semester_vi', name: 'MCA Semester VI', year: 2026 }, { id: 'mca_semester_viii', name: 'MCA Semester VIII', year: 2026 } ];
 
 const FACULTY_LIST = [
     { name: 'Ms. Shraddha Soni',       email: 'shraddha.soni@college.ac.in',       role: 'faculty', subjects: ['Object Oriented Programming Using C++'],     semesters: ['mca_semester_ii', 'mca_semester_iv'] },
@@ -98,36 +77,9 @@ const FACULTY_LIST = [
 ];
 
 const LECTURES = [
-    // ── MCA SEM II / SECTION A ───────────────────────────────────────────────
-    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'MON', startTime: '11:00', endTime: '13:00', subject: 'Oops Lab using C++',                      faculty: 'Mr. Dheeraj Upadhayay',   type: 'Lab' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'MON', startTime: '13:00', endTime: '14:00', subject: 'Internet & Web Programming',               faculty: 'Ms. Ragini Modi',          type: 'Lecture' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'MON', startTime: '14:00', endTime: '15:00', subject: 'Digital Computer Organization',            faculty: 'Dr. Rajesh Verma',         type: 'Lecture' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'MON', startTime: '15:00', endTime: '16:00', subject: 'Hindi',                                    faculty: 'Dr. Pushpendra Dubey',     type: 'Lecture' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'MON', startTime: '16:00', endTime: '17:00', subject: 'Mathematics-II',                           faculty: 'Mr. Hemant Prakash Gavde', type: 'Lecture' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'TUE', startTime: '11:00', endTime: '13:00', subject: 'Oops Lab using C++',                      faculty: 'Mr. Dheeraj Upadhayay',   type: 'Lab' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'TUE', startTime: '13:00', endTime: '14:00', subject: 'Internet & Web Programming',               faculty: 'Ms. Ragini Modi',          type: 'Lecture' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'TUE', startTime: '14:00', endTime: '15:00', subject: 'Digital Computer Organization',            faculty: 'Dr. Rajesh Verma',         type: 'Lecture' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'TUE', startTime: '15:00', endTime: '16:00', subject: 'Hindi',                                    faculty: 'Dr. Pushpendra Dubey',     type: 'Lecture' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'TUE', startTime: '16:00', endTime: '17:00', subject: 'Mathematics-II',                           faculty: 'Mr. Hemant Prakash Gavde', type: 'Lecture' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'WED', startTime: '11:00', endTime: '13:00', subject: 'Object Oriented Programming Using C++',   faculty: 'Ms. Shraddha Soni',        type: 'Lecture' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'WED', startTime: '13:00', endTime: '14:00', subject: 'Mathematics-II',                           faculty: 'Mr. Hemant Prakash Gavde', type: 'Lecture' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'WED', startTime: '14:00', endTime: '15:00', subject: 'Hindi',                                    faculty: 'Dr. Pushpendra Dubey',     type: 'Lecture' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'WED', startTime: '15:00', endTime: '16:00', subject: 'Internet & Web Programming',               faculty: 'Ms. Ragini Modi',          type: 'Lecture' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'THU', startTime: '11:00', endTime: '13:00', subject: 'Object Oriented Programming Using C++',   faculty: 'Ms. Shraddha Soni',        type: 'Lecture' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'THU', startTime: '13:00', endTime: '14:00', subject: 'Mathematics-II',                           faculty: 'Mr. Hemant Prakash Gavde', type: 'Lecture' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'THU', startTime: '14:00', endTime: '15:00', subject: 'Hindi',                                    faculty: 'Dr. Pushpendra Dubey',     type: 'Lecture' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'THU', startTime: '15:00', endTime: '16:00', subject: 'Internet & Web Programming',               faculty: 'Ms. Ragini Modi',          type: 'Lecture' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'FRI', startTime: '11:00', endTime: '13:00', subject: 'Object Oriented Programming Using C++',   faculty: 'Ms. Shraddha Soni',        type: 'Lecture' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'FRI', startTime: '13:00', endTime: '14:00', subject: 'Digital Computer Organization',            faculty: 'Dr. Rajesh Verma',         type: 'Lecture' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: 'Lab', day: 'FRI', startTime: '14:00', endTime: '16:00', subject: 'IWP Lab',                                 faculty: 'Mr. Anshul Satle',         type: 'Lab' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'SAT', startTime: '11:00', endTime: '13:00', subject: 'Object Oriented Programming Using C++',   faculty: 'Ms. Shraddha Soni',        type: 'Lecture' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'SAT', startTime: '13:00', endTime: '14:00', subject: 'Digital Computer Organization',            faculty: 'Dr. Rajesh Verma',         type: 'Lecture' },
-    { semesterId: 'mca_semester_ii', section: 'A', room: 'Lab', day: 'SAT', startTime: '14:00', endTime: '16:00', subject: 'IWP Lab',                                 faculty: 'Mr. Anshul Satle',         type: 'Lab' },
-
-    // ── MCA SEM II / SECTION B ───────────────────────────────────────────────
-    { semesterId: 'mca_semester_ii', section: 'B', room: '202', day: 'MON', startTime: '11:00', endTime: '12:00', subject: 'Internet & Web Programming',               faculty: 'Ms. Kirti Vijayvergia',    type: 'Lecture' },
-    { semesterId: 'mca_semester_ii', section: 'B', room: '202', day: 'MON', startTime: '12:00', endTime: '13:00', subject: 'Object Oriented Programming Using C++',   faculty: 'Ms. Shraddha Soni',        type: 'Lecture' },
-    { semesterId: 'mca_semester_ii', section: 'B', room: '202', day: 'MON', startTime: '13:00', endTime: '14:00', subject: 'Mathematics-II',                           faculty: 'Mr. Hemant Prakash Gavde', type: 'Lecture' },
+    { semesterId: 'mca_semester_ii', section: 'A', room: '201', day: 'MON', startTime: '14:00', endTime: '15:00', subject: 'Digital Computer Organization', faculty: 'Dr. Rajesh Verma', type: 'Lecture' },
+    { semesterId: 'mca_semester_ii', section: 'B', room: '202', day: 'TUE', startTime: '15:00', endTime: '16:00', subject: 'DCO', faculty: 'Dr. Rajesh Verma', type: 'Lecture' },
+    { semesterId: 'mca_semester_iv', section: 'A', room: '303', day: 'WED', startTime: '09:00', endTime: '11:00', subject: 'DCO Advanced', faculty: 'Dr. Rajesh Verma', type: 'Lecture' },
     { semesterId: 'mca_semester_ii', section: 'B', room: '202', day: 'MON', startTime: '14:00', endTime: '15:00', subject: 'Hindi',                                    faculty: 'Dr. Pushpendra Dubey',     type: 'Lecture' },
     { semesterId: 'mca_semester_ii', section: 'B', room: '202', day: 'TUE', startTime: '11:00', endTime: '12:00', subject: 'Internet & Web Programming',               faculty: 'Ms. Kirti Vijayvergia',    type: 'Lecture' },
     { semesterId: 'mca_semester_ii', section: 'B', room: '202', day: 'TUE', startTime: '12:00', endTime: '13:00', subject: 'Object Oriented Programming Using C++',   faculty: 'Ms. Shraddha Soni',        type: 'Lecture' },
@@ -197,6 +149,15 @@ const LECTURES = [
     { semesterId: 'mca_semester_iv', section: 'B', room: '302', day: 'SAT', startTime: '11:00', endTime: '12:00', subject: 'Advanced Database Management',             faculty: 'Ms. Sonal Shrivas',        type: 'Lecture' },
     { semesterId: 'mca_semester_iv', section: 'B', room: '302', day: 'SAT', startTime: '12:00', endTime: '13:00', subject: 'Computer Networks',                        faculty: 'Ms. Anuradha Savita',      type: 'Lecture' },
     { semesterId: 'mca_semester_iv', section: 'B', room: '302', day: 'SAT', startTime: '13:00', endTime: '14:00', subject: 'Software Engineering',                    faculty: 'Ms. Anuradha Savita',      type: 'Lecture' },
+
+
+    // --- SEMESTER VI ---
+    { semesterId: 'mca_semester_vi', section: 'A', room: '301', day: 'WED', startTime: '08:00', endTime: '10:00', subject: 'HCI', faculty: 'Dr. Ajay Jaiswal', type: 'Lecture' },
+    { semesterId: 'mca_semester_vi', section: 'B', room: '302', day: 'WED', startTime: '11:00', endTime: '13:00', subject: 'Android Prog', faculty: 'Mr. Dheeraj Upadhayay', type: 'Lab' },
+
+    // --- SEMESTER VIII ---
+    { semesterId: 'mca_semester_viii', section: 'A', room: '303', day: 'THU', startTime: '09:00', endTime: '11:00', subject: 'ECT', faculty: 'Dr. Ramesh Thakur', type: 'Lecture' },
+    { semesterId: 'mca_semester_viii', section: 'B', room: '304', day: 'THU', startTime: '08:00', endTime: '10:00', subject: 'Mobile Computing', faculty: 'Dr. Manju Suchdeo', type: 'Lecture' },
 ];
 
 // ─── MAIN SEEDER ─────────────────────────────────────────────────────────────
@@ -226,6 +187,7 @@ async function runSeeding() {
             await firestoreSet('users', docId, {
                 ...faculty,
                 uid: docId,
+                facultyId: docId, // Explicitly add facultyId for consistency
                 createdFrom: 'pdf-seed',
                 createdAt: NOW
             });
@@ -241,9 +203,11 @@ async function runSeeding() {
     let failCount = 0;
     for (const lec of LECTURES) {
         const path = `semesters/${lec.semesterId}/lectures`;
+        const facultyId = lec.faculty.toLowerCase().replace(/[\s.]+/g, '_').replace(/[^a-z_]/g, '');
         try {
             await firestoreAdd(path, {
                 ...lec,
+                facultyId: facultyId, // Store both name AND UID for filtering
                 status: 'scheduled',
                 createdFrom: 'pdf-seed',
                 createdAt: NOW
@@ -256,7 +220,31 @@ async function runSeeding() {
     }
     console.log(`   ✅ ${successCount} lectures seeded  (${failCount} failed)`);
 
-    // 4. Summary
+    // 5. Seed Test Students (into semester collection)
+    console.log('\n👥 Seeding test students...');
+    const TEST_STUDENTS = [
+        { enrollmentNo: 'MCA2026001', name: 'Alice Student', phone: '+919000000001', section: 'A' },
+        { enrollmentNo: 'MCA2026002', name: 'Bob Student',   phone: '+919000000002', section: 'B' },
+        { enrollmentNo: 'MCA2026003', name: 'Charlie Dev',   phone: '+919000000003', section: 'A' }
+    ];
+
+    for (const student of TEST_STUDENTS) {
+        const path = `semesters/mca_semester_ii/students`;
+        try {
+            await firestoreSet(path, student.enrollmentNo, {
+                ...student,
+                status: 'active',
+                authCreated: false,
+                passwordChanged: false,
+                createdAt: NOW
+            });
+            console.log(`   ✅ ${student.name} (${student.enrollmentNo})`);
+        } catch (e) {
+            console.error(`   ❌ ${student.enrollmentNo}: ${e.message}`);
+        }
+    }
+
+    // 6. Summary
     console.log('\n' + '═'.repeat(55));
     console.log('✅  SEEDING COMPLETE!');
     console.log('═'.repeat(55));
