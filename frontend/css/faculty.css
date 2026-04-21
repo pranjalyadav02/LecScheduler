@@ -1,2 +1,98 @@
 /* Unified CSS is imported from admin.css */
 @import url('./admin.css');
+
+.hidden {
+    display: none;
+}
+
+.group-chat-view {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(8px);
+}
+
+.faculty-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--primary-color, #4a90e2);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.global-filter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 6px 15px;
+    border-radius: 10px;
+}
+
+.global-filter label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.global-filter select {
+    background: transparent;
+    border: none;
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    outline: none;
+}
+
+.global-filter select option {
+    background: #4a90e2;
+    color: white;
+}
+
+.filter-row {
+    margin: 10px 0;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.filter-row select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color, #ddd);
+    background: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-row select:hover {
+    border-color: var(--primary-color, #4a90e2);
+}
+
+.faculty-summary {
+    flex-grow: 1;
+    margin: 0 40px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: white;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+}
+
+.teaching-load strong {
+    color: #ffd700;
+}

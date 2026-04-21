@@ -8,6 +8,10 @@
  */
 
 async function seedTestData() {
+    // Get or initialize Firebase services
+    let auth = (window.firebaseApp && window.firebaseApp.auth) || (window.auth);
+    let db = (window.firebaseApp && window.firebaseApp.db) || (window.db);
+    
     // Wait for firebaseApp to be initialized by firebase-config.js
     // Wait for firebaseReady promise if available
     if (window.firebaseReady) {

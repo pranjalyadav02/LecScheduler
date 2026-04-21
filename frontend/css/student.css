@@ -1,2 +1,113 @@
 /* Unified CSS is imported from admin.css */
 @import url('./admin.css');
+
+.timetable-table th,
+.timetable-table td {
+    vertical-align: top;
+}
+
+.timetable-meta {
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+.meta-separator {
+    margin: 0 8px;
+}
+
+.timetable-view-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.section-switcher {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.section-switcher select {
+    min-width: 80px;
+}
+
+.timetable-grid-wrap {
+    overflow-x: auto;
+}
+
+.timetable-grid-table th,
+.timetable-grid-table td {
+    min-width: 100px;
+    text-align: center;
+}
+
+.day-cell {
+    font-weight: 600;
+    text-align: left !important;
+    min-width: 120px;
+}
+
+.slot-cell {
+    border-radius: 8px;
+}
+
+.slot-subject {
+    font-weight: 600;
+}
+
+.slot-faculty,
+.slot-time {
+    font-size: 12px;
+    opacity: 0.85;
+}
+
+.empty-slot {
+    color: #6b7280;
+}
+
+.theory-slot {
+    background: #eaf2ff;
+}
+
+.lab-slot {
+    background: #e8f9ee;
+}
+
+.clash-slot {
+    background: #ffe9e9 !important;
+    border: 1px solid #ef4444;
+}
+
+.timetable-list-view {
+    display: grid;
+    gap: 12px;
+}
+
+.day-list-block {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 10px;
+    background: #fff;
+}
+
+.day-list-block h3 {
+    margin: 0 0 8px;
+}
+
+.list-item {
+    padding: 8px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.list-time {
+    font-size: 12px;
+    color: #374151;
+}
+
+.list-text {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}

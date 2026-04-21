@@ -563,9 +563,11 @@ async function parseTimetableWithGemini(text) {
     // to discover which models are available, then update this list accordingly.
     // Each entry is tried in order; the first one that returns data is used.
     const modelsToTry = [
-        "gemini-2.5-flash",          // ← PRIMARY (confirmed working via test_parser_simple)
-        "gemini-2.0-flash",          // fallback – may have quota limits on free tier
-        "gemini-1.5-flash",          // legacy alias, may be 404 on some projects
+        "gemini-1.5-flash",          // PRIMARY - Most stable for structured output
+        "gemini-flash-latest",       // Fallback 1
+        "gemini-pro-latest",         // Fallback 2 (if pro is needed)
+        "gemini-2.5-flash",          // Fallback 3
+        "gemini-2.0-flash",          // Fallback 4
     ];
     let lastError;
 

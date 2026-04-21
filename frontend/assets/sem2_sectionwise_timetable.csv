@@ -1,0 +1,61 @@
+Semester,Section,Day,Start,End,Subject,Code,Faculty,Room
+SEM2,A,Monday,11:00,13:00,C++ Lab,IC-209D,Mr. Dheeraj Upadhayay,201
+SEM2,A,Monday,13:00,14:00,IWP,IC-202C,Ms. Ragini Modi,201
+SEM2,A,Monday,14:00,15:00,DCO,IC-204B,Dr. Rajesh Verma,201
+SEM2,A,Monday,15:00,16:00,Hindi,IC-206D,Dr. Pushpendra Dubey,201
+SEM2,A,Monday,16:00,17:00,Mathematics-II,IC-201,Mr. Hemant Gavde,201
+SEM2,B,Monday,13:00,14:00,IWP,IC-202C,Ms. Kirti Vijayvergia,202
+SEM2,B,Monday,14:00,15:00,OOPs (C++),IC-205C,Ms. Shraddha Soni,202
+SEM2,B,Monday,15:00,16:00,Mathematics-II,IC-201,Mr. Hemant Gavde,202
+SEM2,B,Monday,16:00,17:00,Hindi,IC-206D,Dr. Pushpendra Dubey,202
+SEM4,A,Monday,11:00,13:00,Java Lab,IC-408C,Mr. Pratham Jaiswal,203
+SEM4,A,Monday,13:00,14:00,Unix OS,IC-405A,Dr. Vivek Shrivastav,203
+SEM4,A,Monday,14:00,15:00,Discrete Maths,IC-402A,Dr. Rupesh Sendre,203
+SEM4,A,Monday,15:00,16:00,DCC,IC-401C,Mr. Rajesh Verma,203
+SEM4,B,Monday,13:00,14:00,Discrete Maths,IC-402A,Dr. Nitin Nagar,204
+SEM4,B,Monday,14:00,15:00,Java,IC-403D,Mr. Pratham Jaiswal,204
+SEM4,B,Monday,15:00,17:00,Unix Lab,IC-411C,Mr. Prakshep Goswami,Lab
+SEM6,A,Monday,10:00,11:00,HCI,IC-601A,Dr. Ajay Jaiswal,201
+SEM6,A,Monday,11:00,12:00,OS,IC-612A,Dr. Basant Namdeo,201
+SEM6,A,Monday,12:00,13:00,SAD,IC-604,Dr. Rahul Singhai,201
+SEM6,A,Monday,13:00,15:00,Android Lab,IC-609A,Mr. Dheeraj Upadhayay,Lab
+SEM6,B,Monday,11:00,12:00,SAD,IC-604,Dr. Rahul Singhai,202
+SEM6,B,Monday,12:00,13:00,Cloud Computing,IC-611A,Dr. Vivek Shrivastava,202
+SEM6,B,Monday,13:00,14:00,Project,IC-605,NA,202
+SEM8,A,Monday,10:00,11:00,ECT,IC-802B,Dr. Ramesh Thakur,203
+SEM8,A,Monday,11:00,12:00,ECT,IC-802B,Dr. Ramesh Thakur,203
+SEM8,A,Monday,12:00,13:00,TOC,IC-812,Dr. Yasmin Shaikh,203
+SEM8,A,Monday,13:00,14:00,DMW,IC-811B,Dr. Pradeep Jatav,203
+SEM8,B,Monday,08:00,10:00,ECT Lab,IC-810D,Visiting Faculty,Lab
+SEM8,B,Monday,10:00,12:00,MWC,IC-801B,Dr. Manju Suchdeo,204
+SEM8,B,Monday,12:00,13:00,ECT,IC-802B,Dr. Ramesh Thakur,204
+SEM2,A,Wednesday,13:00,14:00,OOPs (C++),IC-205C,Ms. Shraddha Soni,201
+SEM2,A,Wednesday,14:00,15:00,Mathematics-II,IC-201,Mr. Hemant Gavde,201
+SEM2,A,Wednesday,15:00,16:00,Hindi,IC-206D,Dr. Pushpendra Dubey,201
+SEM2,A,Wednesday,16:00,17:00,IWP,IC-202C,Ms. Ragini Modi,201
+SEM2,B,Wednesday,11:00,13:00,C++ Lab,IC-209D,Mr. Dheeraj Upadhayay,Lab
+SEM2,B,Wednesday,13:00,14:00,Mathematics-II,IC-201,Mr. Hemant Gavde,202
+SEM2,B,Wednesday,14:00,15:00,DCO,IC-204B,Mr. Prakshep Goswami,202
+SEM2,B,Wednesday,15:00,16:00,Hindi,IC-206D,Dr. Pushpendra Dubey,202
+SEM4,A,Wednesday,13:00,14:00,Java,IC-403D,Dr. Nitin Nagar,203
+SEM4,A,Wednesday,14:00,15:00,Unix OS,IC-405A,Dr. Vivek Shrivastav,203
+SEM4,A,Wednesday,15:00,16:00,DCC,IC-401C,Mr. Rajesh Verma,203
+SEM4,A,Wednesday,16:00,17:00,Entrepreneurship,IC-406D,Dr. Monalisa Khatre,203
+SEM4,B,Wednesday,11:00,13:00,Java Lab,IC-408C,Mr. Pratham Jaiswal,204
+SEM4,B,Wednesday,13:00,14:00,Unix OS,IC-405A,Dr. Vivek Shrivastava,204
+SEM4,B,Wednesday,14:00,15:00,DCC,IC-401C,Mr. Rajesh Verma,204
+SEM4,B,Wednesday,15:00,16:00,Entrepreneurship,IC-406D,Dr. Monalisa Khatre,204
+SEM6,A,Wednesday,08:00,10:00,HCI,IC-601A,Dr. Ajay Jaiswal,201
+SEM6,A,Wednesday,11:00,12:00,Cloud Computing,IC-611A,Dr. Poonam Mangwani,201
+SEM6,A,Wednesday,12:00,13:00,OS,IC-612A,Dr. Basant Namdeo,201
+SEM6,A,Wednesday,13:00,15:00,Project,IC-605,NA,201
+SEM6,B,Wednesday,11:00,12:00,OS,IC-612A,Dr. Basant Namdeo,202
+SEM6,B,Wednesday,12:00,13:00,SAD,IC-604,Dr. Rahul Singhai,202
+SEM6,B,Wednesday,13:00,15:00,Android Lab,IC-609A,Mr. Dheeraj Upadhayay,Lab
+SEM8,A,Wednesday,09:00,11:00,ECT Lab,IC-810D,Visiting Faculty,Lab
+SEM8,A,Wednesday,11:00,13:00,MWC,IC-801B,Dr. Manju Suchdeo,203
+SEM8,A,Wednesday,13:00,14:00,Soft Computing,IC-812A,Dr. Jugendra Dongre,203
+SEM8,B,Wednesday,09:00,11:00,MWC Lab,IC-813,Visiting Faculty,Lab
+SEM8,B,Wednesday,11:00,12:00,TOC,IC-812,Dr. Yasmin Shaikh,204
+SEM8,B,Wednesday,12:00,13:00,Soft Computing,IC-812A,Dr. Jugendra Dongre,204
+SEM8,B,Wednesday,13:00,14:00,DMW,IC-811B,Dr. Pradeep Jatav,204

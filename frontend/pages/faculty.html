@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lecture Scheduler - Faculty Portal</title>
-    <link rel="stylesheet" href="../css/faculty.css">
+    <link rel="stylesheet" href="/css/faculty.css">
 </head>
 
 <body>
@@ -18,16 +18,18 @@
         <!-- Header -->
         <header class="faculty-header">
             <h1>👨‍🏫 Faculty Portal</h1>
+            <div id="facultySummary" class="faculty-summary"></div>
             <div class="header-right">
+                <div class="global-filter">
+                    <label for="dashSemSelect">Semester:</label>
+                    <select id="dashSemSelect" onchange="onDashboardSemesterChange()">
+                        <option value="">Loading...</option>
+                    </select>
+                </div>
                 <span id="facultyName">Faculty</span>
                 <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
         </header>
-
-        <!-- Semester Display -->
-        <div class="semester-info">
-            <h2 id="semesterDisplay">Semester: --</h2>
-        </div>
 
         <!-- Main Dashboard (Single-Action Cards) -->
         <main class="dashboard-grid">
@@ -35,6 +37,13 @@
             <!-- 1. View My Lectures -->
             <div class="action-card">
                 <h2>📅 My Lectures</h2>
+                <div class="filter-row">
+                    <select id="dashSecSelect" onchange="loadMyLecturesForSelect()">
+                        <option value="">All Sections</option>
+                        <option value="A">Section A</option>
+                        <option value="B">Section B</option>
+                    </select>
+                </div>
                 <p>View all your scheduled lectures this semester.</p>
                 <button class="primary-btn" onclick="showMyLectures()">View Lectures</button>
             </div>
@@ -78,40 +87,58 @@
                 <div id="rescheduleStatus" class="status-message"></div>
             </div>
 
-            <!-- 5. Subject Chat (Now with visibility) -->
+            <!-- 4. Send Announcement -->
             <div class="action-card">
-                <h2>💬 Subject Chat</h2>
-                <p>Chat with students in a specific subject group.</p>
-                <div id="subjectChatMessages" class="chat-messages" style="height: 200px; overflow-y: auto; margin-bottom: 15px; border: 1px solid #ddd; padding: 10px; border-radius: 8px;">
-                    <!-- Messages populated here -->
-                    <p class="empty-message">Select a subject to see messages.</p>
-                </div>
-                <form onsubmit="handleSendSubjectMessage(event)">
-                    <select id="chatSubjectSelect" required aria-label="Select subject for chat" onchange="loadSubjectsForChat()">
-                        <option value="">-- Select Subject --</option>
-                    </select>
-                    <textarea id="subjectChatMessage" placeholder="Message to group..." required rows="2"></textarea>
-                    <button type="submit" class="primary-btn">Send to Group</button>
+                <h2>📢 Announce to Students</h2>
+                <p>Send notice about lectures or classes to all students.</p>
+                <form onsubmit="handleFacultyAnnouncement(event)">
+                    <input type="text" id="facultyAnnouncementTitle" placeholder="Title" required>
+                    <textarea id="facultyAnnouncementMsg" placeholder="Message" required rows="4"></textarea>
+                    <button type="submit" class="primary-btn">Send Announcement</button>
                 </form>
-                <div id="subjectChatStatus" class="status-message"></div>
+                <div id="facultyAnnouncementStatus" class="status-message"></div>
             </div>
 
-            <!-- 6. Message Requests -->
+            <!-- 5. Attendance (Optional) -->
             <div class="action-card">
-                <h2>📩 Message Requests</h2>
-                <p>Personal messages from students.</p>
-                <div id="messageRequestsList" class="notifications-list" style="max-height: 250px; overflow-y: auto;">
-                    <p class="empty-message">No pending requests.</p>
-                </div>
-                <div id="messageRequestsStatus" class="status-message"></div>
-            </div>
-
-            <!-- 7. Lecture History -->
+                <h2>📊 Lecture History</h2>
                 <p>View past lectures and any changes made.</p>
                 <button class="primary-btn" onclick="showLectureHistory()">View History</button>
             </div>
 
+            <!-- 6. Group Chat Entry -->
+            <div class="action-card">
+                <h2>💬 Group Chat</h2>
+                <p>Open semester-wise group chat in a separate view.</p>
+                <button class="primary-btn" onclick="openGroupChatView()">Enter Group Chat</button>
+            </div>
+
         </main>
+
+        <!-- Dedicated Group Chat View -->
+        <section id="groupChatView" class="group-chat-view hidden">
+            <div class="group-chat-header">
+                <h2>💬 Group Chat</h2>
+                <button class="secondary-btn" onclick="closeGroupChatView()">Back to Dashboard</button>
+            </div>
+            <p class="instructions">Choose semester and section, then chat in real time.</p>
+            <div class="chat-filters">
+                <select id="chatSemSelect" onchange="onChatSemesterChange()">
+                    <option value="">Select Semester</option>
+                </select>
+                <select id="chatSecSelect" onchange="switchChat()">
+                    <option value="A">Section A</option>
+                    <option value="B">Section B</option>
+                </select>
+            </div>
+            <div id="chatMessages" class="chat-messages">
+                <p class="empty-chat">Select a semester to start chatting</p>
+            </div>
+            <form onsubmit="handleChatSubmit(event)" class="chat-input-form">
+                <input type="text" id="chatInput" placeholder="Type a message..." required autocomplete="off">
+                <button type="submit" class="send-btn">Send</button>
+            </form>
+        </section>
     </div>
 
     <!-- ===== MODALS ===== -->
@@ -138,10 +165,12 @@
     <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-storage-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-functions-compat.js" defer></script>
-    <script src="../js/firebase-config.js" defer></script>
-    <script src="../js/common.js" defer></script>
-    <script src="../js/faculty.js" defer></script>
+    <script src="/js/firebase-config.js" defer></script>
+    <script src="/js/common.js" defer></script>
+    <script src="/js/chat.js" defer></script>
+    <script src="/js/faculty.js" defer></script>
 </body>
 
 </html>

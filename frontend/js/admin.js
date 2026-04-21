@@ -3,7 +3,22 @@
 // ============================================================================
 
 let currentSemesterId = null;
-const { db, storage, functions, auth } = window.firebaseApp;
+const INSTITUTIONAL_PDF_NAME = 'Updated_MCA_TT_Jan_May_12012026 (1).pdf';
+const INSTITUTIONAL_CSV_PATH = '../assets/sem2_sectionwise_timetable.csv';
+const SEMESTER_ID_MAP = {
+    SEM2: 'mca_semester_ii',
+    SEM4: 'mca_semester_iv',
+    SEM6: 'mca_semester_vi',
+    SEM8: 'mca_semester_viii',
+};
+const SEMESTER_LABEL_MAP = {
+    SEM2: 'II',
+    SEM4: 'IV',
+    SEM6: 'VI',
+    SEM8: 'VIII',
+};
+// Firebase services are available as window.auth, window.db, window.storage, window.functions
+// Initialized by firebase-config.js
 
 // ============================================================================
 // INITIALIZATION
@@ -12,14 +27,14 @@ const { db, storage, functions, auth } = window.firebaseApp;
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         // Check if user is authenticated and is admin
-        auth.onAuthStateChanged(async (user) => {
+        window.auth.onAuthStateChanged(async (user) => {
             if (!user) {
-                window.location.href = 'login.html';
+                window.location.href = '/pages/login.html';
                 return;
             }
 
             // Verify admin role
-            const userDoc = await db.collection('users').doc(user.uid).get();
+            const userDoc = await window.db.collection('users').doc(user.uid).get();
             if (!userDoc.exists || userDoc.data().role !== 'admin') {
                 showError('Unauthorized. Admin access required.');
                 setTimeout(() => logout(), 2000);
@@ -40,8 +55,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadSemesters() {
     try {
-        const snapshot = await db.collection('semesters').get();
+        const snapshot = await window.db.collection('semesters').get();
         const select = document.getElementById('semesterSelect');
+        select.innerHTML = '<option value="">-- Choose Semester --</option>';
 
         snapshot.forEach(doc => {
             const option = document.createElement('option');
@@ -52,6 +68,19 @@ async function loadSemesters() {
     } catch (error) {
         showError(`Failed to load semesters: ${error.message}`);
     }
+}
+
+function setSemesterDropdownOptions(semesters) {
+    const select = document.getElementById('semesterSelect');
+    if (!select) return;
+
+    select.innerHTML = '<option value="">-- Choose Semester --</option>';
+    semesters.forEach(sem => {
+        const option = document.createElement('option');
+        option.value = sem.id;
+        option.textContent = sem.name || sem.id;
+        select.appendChild(option);
+    });
 }
 
 async function loadSemesterData() {
@@ -67,6 +96,207 @@ async function loadSemesterData() {
     } catch (error) {
         showError(error.message);
     }
+}
+
+// ============================================================================
+// SYSTEM MASTER RESET
+// ============================================================================
+
+const MASTER_TIMETABLE_DATA = [
+    {
+        semesterId: 'mca_semester_ii',
+        name: 'MCA Semester II (Jan-May 2026)',
+        sections: [
+            {
+                name: 'A', room: '201',
+                faculties: { 'IC-205C': 'Ms. Shraddha Soni', 'IC-202C': 'Ms. Ragini Modi', 'IC-204B': 'Dr. Rajesh Verma', 'IC-201': 'Mr. Hemant Prakash Gavde', 'IC-206D': 'Dr. Pushpendra Dubey', 'IC-209D': 'Mr. Dheeraj Upadhayay', 'IC-210E': 'Mr. Anshul Satle' },
+                schedule: [
+                    { days: ['Monday', 'Tuesday'], time: '11:00-13:00', subject: 'C++ Lab', code: 'IC-209D' },
+                    { days: ['Monday', 'Tuesday'], time: '13:00-14:00', subject: 'IWP', code: 'IC-202C' },
+                    { days: ['Monday', 'Tuesday'], time: '14:00-15:00', subject: 'DCO', code: 'IC-204B' },
+                    { days: ['Monday', 'Tuesday'], time: '15:00-16:00', subject: 'Hindi', code: 'IC-206D' },
+                    { days: ['Monday', 'Tuesday'], time: '16:00-17:00', subject: 'Mathematics-II', code: 'IC-201' },
+                    { days: ['Wednesday', 'Thursday'], time: '13:00-14:00', subject: 'Oops using C++', code: 'IC-205C' },
+                    { days: ['Wednesday', 'Thursday'], time: '14:00-15:00', subject: 'Mathematics-II', code: 'IC-201' },
+                    { days: ['Wednesday', 'Thursday'], time: '15:00-16:00', subject: 'Hindi', code: 'IC-206D' },
+                    { days: ['Wednesday', 'Thursday'], time: '16:00-17:00', subject: 'IWP', code: 'IC-202C' },
+                    { days: ['Friday', 'Saturday'], time: '13:00-14:00', subject: 'Oops Using C++', code: 'IC-205C' },
+                    { days: ['Friday', 'Saturday'], time: '14:00-15:00', subject: 'DCO', code: 'IC-204B' },
+                    { days: ['Friday', 'Saturday'], time: '15:00-17:00', subject: 'IWP Lab', code: 'IC-210E' }
+                ]
+            },
+            {
+                name: 'B', room: '202',
+                faculties: { 'IC-205C': 'Ms. Shraddha Soni', 'IC-202C': 'Ms. Kirti Vijayvergia', 'IC-204B': 'Mr Prakshep Goswami', 'IC-201': 'Mr. Hemant Prakash Gavde', 'IC-206D': 'Dr. Pushpendra Dubey', 'IC-209D': 'Mr. Dheeraj Upadhayay', 'IC-210E': 'Mr. Rajesh Verma' },
+                schedule: [
+                    { days: ['Monday', 'Tuesday'], time: '13:00-14:00', subject: 'IWP', code: 'IC-202C' },
+                    { days: ['Monday', 'Tuesday'], time: '14:00-15:00', subject: 'Oops using C++', code: 'IC-205C' },
+                    { days: ['Monday', 'Tuesday'], time: '15:00-16:00', subject: 'Mathematics-II', code: 'IC-201' },
+                    { days: ['Monday', 'Tuesday'], time: '16:00-17:00', subject: 'Hindi', code: 'IC-206D' },
+                    { days: ['Wednesday', 'Thursday'], time: '11:00-13:00', subject: 'C++ Lab', code: 'IC-209D' },
+                    { days: ['Wednesday', 'Thursday'], time: '13:00-14:00', subject: 'Mathematics-II', code: 'IC-201' },
+                    { days: ['Wednesday', 'Thursday'], time: '14:00-15:00', subject: 'DCO', code: 'IC-204B' },
+                    { days: ['Wednesday', 'Thursday'], time: '15:00-16:00', subject: 'Hindi', code: 'IC-206D' },
+                    { days: ['Friday', 'Saturday'], time: '11:00-13:00', subject: 'IWP Lab', code: 'IC-210E' },
+                    { days: ['Friday', 'Saturday'], time: '13:00-14:00', subject: 'DCO', code: 'IC-204B' },
+                    { days: ['Friday', 'Saturday'], time: '14:00-15:00', subject: 'IWP', code: 'IC-202C' },
+                    { days: ['Friday', 'Saturday'], time: '15:00-16:00', subject: 'Oops using C++', code: 'IC-205C' }
+                ]
+            }
+        ]
+    },
+    {
+        semesterId: 'mca_semester_iv',
+        name: 'MCA Semester IV (Jan-May 2026)',
+        sections: [
+            {
+                name: 'A', room: '203',
+                faculties: { 'IC-403D': 'Dr. Nitin Nagar', 'IC-402A': 'Dr. Rupesh Sendre', 'IC-405A': 'Dr. Vivek Shrivastav', 'IC-401C': 'Mr. Rajesh Verma', 'IC-406D': 'Dr. Monalisa Khatre', 'IC-408C': 'Mr. Pratham Jaiswal', 'IC-411C': 'Mr Prakshep Goswami' },
+                schedule: [
+                    { days: ['Monday', 'Tuesday'], time: '11:00-13:00', subject: 'Prog. with Java Lab', code: 'IC-408C' },
+                    { days: ['Monday', 'Tuesday'], time: '13:00-14:00', subject: 'Unix OS', code: 'IC-405A' },
+                    { days: ['Monday', 'Tuesday'], time: '14:00-15:00', subject: 'Discrete Maths', code: 'IC-402A' },
+                    { days: ['Monday', 'Tuesday'], time: '15:00-16:00', subject: 'DCC', code: 'IC-401C' },
+                    { days: ['Wednesday', 'Thursday'], time: '13:00-14:00', subject: 'Prog. With Java', code: 'IC-403D' },
+                    { days: ['Wednesday', 'Thursday'], time: '14:00-15:00', subject: 'Unix OS', code: 'IC-405A' },
+                    { days: ['Wednesday', 'Thursday'], time: '15:00-16:00', subject: 'DCC', code: 'IC-401C' },
+                    { days: ['Wednesday', 'Thursday'], time: '16:00-17:00', subject: 'Eship', code: 'IC-406D' },
+                    { days: ['Friday', 'Saturday'], time: '11:00-13:00', subject: 'Unix OS Lab', code: 'IC-411C' },
+                    { days: ['Friday', 'Saturday'], time: '13:00-14:00', subject: 'Discrete Maths', code: 'IC-402A' },
+                    { days: ['Friday', 'Saturday'], time: '14:00-15:00', subject: 'Prog. With Java', code: 'IC-403D' },
+                    { days: ['Friday', 'Saturday'], time: '15:00-16:00', subject: 'E.ship', code: 'IC-406D' }
+                ]
+            },
+            {
+                name: 'B', room: '204',
+                faculties: { 'IC-403D': 'Mr. Pratham Jaiswal', 'IC-402A': 'Dr. Nitin Nagar', 'IC-405A': 'Dr. Vivek Shrivastava', 'IC-401C': 'Mr. Rajesh Verma', 'IC-406D': 'Dr. Monalisa Khatre', 'IC-408C': 'Mr. Pratham Jaiswal', 'IC-411C': 'Mr Prakshep Goswami' },
+                schedule: [
+                    { days: ['Monday', 'Tuesday'], time: '13:00-14:00', subject: 'Discrete Maths', code: 'IC-402A' },
+                    { days: ['Monday', 'Tuesday'], time: '14:00-15:00', subject: 'Prog. With Java', code: 'IC-403D' },
+                    { days: ['Monday', 'Tuesday'], time: '15:00-17:00', subject: 'Unix OS Lab', code: 'IC-411C' },
+                    { days: ['Wednesday', 'Thursday'], time: '11:00-13:00', subject: 'Prog. with Java Lab', code: 'IC-408C' },
+                    { days: ['Wednesday', 'Thursday'], time: '13:00-14:00', subject: 'Unix OS', code: 'IC-405A' },
+                    { days: ['Wednesday', 'Thursday'], time: '14:00-15:00', subject: 'DCC', code: 'IC-401C' },
+                    { days: ['Wednesday', 'Thursday'], time: '15:00-16:00', subject: 'Eship', code: 'IC-406D' },
+                    { days: ['Wednesday', 'Thursday'], time: '16:00-17:00', subject: 'Prog. With Java', code: 'IC-403D' },
+                    { days: ['Friday', 'Saturday'], time: '13:00-14:00', subject: 'Discrete Maths', code: 'IC-402A' },
+                    { days: ['Friday', 'Saturday'], time: '14:00-15:00', subject: 'Unix OS', code: 'IC-405A' },
+                    { days: ['Friday', 'Saturday'], time: '15:00-16:00', subject: 'DCC', code: 'IC-401C' }
+                ]
+            }
+        ]
+    }
+];
+
+async function handleMasterReset() {
+    if (!confirm('WARNING: This will wipe ALL current lectures and restore the master institutional timetable. Proceed?')) return;
+    
+    try {
+        const statusEl = document.getElementById('resetStatus');
+        showStatus('resetStatus', '🚀 Starting Master Reset...', 'info');
+
+        let totalSems = 0;
+        let totalLectures = 0;
+
+        for (const semData of MASTER_TIMETABLE_DATA) {
+            showStatus('resetStatus', `Processing ${semData.name}...`, 'info');
+            
+            // 1. Ensure semester document exists
+            await window.db.collection('semesters').doc(semData.semesterId).set({
+                name: semData.name,
+                active: true,
+                updatedAt: new Date()
+            }, { merge: true });
+
+            // 2. Wipe existing lectures
+            const lecturesSnap = await window.db.collection('semesters').doc(semData.semesterId)
+                .collection('lectures').get();
+            
+            if (!lecturesSnap.empty) {
+                let batch = window.db.batch();
+                let count = 0;
+                for (const doc of lecturesSnap.docs) {
+                    batch.delete(doc.ref);
+                    count++;
+                    if (count === 450) { await batch.commit(); batch = window.db.batch(); count = 0; }
+                }
+                if (count > 0) await batch.commit();
+            }
+
+            // 3. Create expanded lectures
+            for (const section of semData.sections) {
+                let batch = window.db.batch();
+                let count = 0;
+                
+                for (const entry of section.schedule) {
+                    const expanded = entryToLectures(entry, section, semData.semesterId);
+                    
+                    for (const lec of expanded) {
+                        const lectureId = `${lec.day}_${lec.startTime}_${lec.section}_${lec.code || lec.subject}`
+                            .toLowerCase().replace(/[^a-z0-9_]+/g, '_');
+                        
+                        const ref = window.db.collection('semesters').doc(semData.semesterId)
+                            .collection('lectures').doc(lectureId);
+                        
+                        batch.set(ref, {
+                            ...lec,
+                            status: 'scheduled',
+                            updatedAt: new Date()
+                        });
+                        count++;
+                        totalLectures++;
+                        
+                        // Commit large batches
+                        if (count === 400) {
+                            await batch.commit();
+                            batch = window.db.batch();
+                            count = 0;
+                        }
+                    }
+                }
+                if (count > 0) await batch.commit();
+            }
+            totalSems++;
+        }
+        
+        showStatus('resetStatus', `✅ Master Reset Complete! Seeded ${totalSems} semesters and ${totalLectures} lectures.`, 'success');
+        if (typeof loadSemesters === 'function') loadSemesters();
+    } catch (error) {
+        console.error('Master Reset failed:', error);
+        showStatus('resetStatus', `❌ Reset failed: ${error.message}`, 'error');
+    }
+}
+
+/**
+ * Expands a schedule entry (e.g. Mon-Tue) into individual daily lectures.
+ */
+function entryToLectures(entry, section, semesterId) {
+    const lectures = [];
+    const [start, end] = entry.time.split('-');
+    
+    // Normalize faculty ID: "Dr. Rajesh Verma" -> "rajesh_verma"
+    const facultyName = section.faculties[entry.code] || 'TBD';
+    const facultyId = facultyName.toLowerCase()
+        .replace(/^(dr\.|mr\.|ms\.|mrs\.)\s*/i, '') // Remove prefixes
+        .replace(/[\s.]+/g, '_') // Replace spaces and dots with underscores
+        .replace(/[^a-z_]/g, '') // Remove non-alpha
+        .replace(/^_+|_+$/g, ''); // Trim underscores
+
+    for (const day of entry.days) {
+        lectures.push({
+            subject: entry.subject,
+            code: entry.code || '',
+            faculty: facultyName,
+            facultyId: facultyId,
+            day: day,
+            startTime: start,
+            endTime: end,
+            room: section.room,
+            section: section.name,
+            semesterId: semesterId
+        });
+    }
+    return lectures;
 }
 
 // ============================================================================
@@ -95,20 +325,27 @@ async function handlePDFUpload(event) {
     }
 
     try {
-        showStatus('uploadStatus', 'Uploading and processing timetable...', 'info');
+        showStatus('uploadStatus', 'Uploading to secure storage...', 'info');
+        
+        // Upload path: timetables/{semesterId}/{filename}
+        const storageRef = window.storage.ref(`timetables/${currentSemesterId}/${file.name}`);
+        const uploadTask = storageRef.put(file);
 
-        const storagePath = `timetables/${currentSemesterId}/${Date.now()}_${file.name}`;
-        const storageRef = storage.ref(storagePath);
+        uploadTask.on('state_changed', 
+            (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                showStatus('uploadStatus', `Uploading: ${progress.toFixed(0)}%`, 'info');
+            }, 
+            (error) => {
+                showStatus('uploadStatus', `Upload error: ${error.message}`, 'error');
+            }, 
+            async () => {
+                showStatus('uploadStatus', 'Processing PDF content... this may take a moment.', 'info');
+                // The Cloud Function (processPDFTimetable) will trigger automatically on Storage Finalize
+                checkUploadStatus();
+            }
+        );
 
-        // Upload file
-        await storageRef.put(file);
-        showStatus('uploadStatus', 'PDF uploaded. Processing... this may take a minute.', 'success');
-
-        // Clear file input
-        fileInput.value = '';
-
-        // Poll for completion
-        setTimeout(() => checkUploadStatus(), 3000);
     } catch (error) {
         showStatus('uploadStatus', `Upload failed: ${error.message}`, 'error');
     }
@@ -116,7 +353,7 @@ async function handlePDFUpload(event) {
 
 async function checkUploadStatus() {
     try {
-        const uploads = await db.collection('pdf_uploads')
+        const uploads = await window.db.collection('pdf_uploads')
             .where('semesterId', '==', currentSemesterId)
             .orderBy('uploadedAt', 'desc')
             .limit(1)
@@ -152,7 +389,7 @@ async function checkUploadStatus() {
 
 async function loadTimetableSummary() {
     try {
-        const lectures = await db.collection('semesters').doc(currentSemesterId)
+        const lectures = await window.db.collection('semesters').doc(currentSemesterId)
             .collection('lectures')
             .where('status', '!=', 'archived')
             .get();
@@ -185,7 +422,7 @@ async function showTimetableModal() {
     }
 
     try {
-        const lectures = await db.collection('semesters').doc(currentSemesterId)
+        const lectures = await window.db.collection('semesters').doc(currentSemesterId)
             .collection('lectures')
             .orderBy('day')
             .orderBy('startTime')
@@ -236,15 +473,152 @@ function closeTimetableModal() {
     document.getElementById('timetableModal').style.display = 'none';
 }
 
+async function seedInstitutionalTimetableFromCsv() {
+    const response = await fetch(INSTITUTIONAL_CSV_PATH, { cache: 'no-store' });
+    if (!response.ok) {
+        throw new Error(`Could not load institutional data file (${response.status})`);
+    }
+
+    const csvText = await response.text();
+    const lines = csvText.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+    if (lines.length < 2) throw new Error('Institutional timetable CSV is empty');
+
+    const header = lines[0].split(',').map(h => h.trim());
+    const required = ['Semester', 'Section', 'Day', 'Start', 'End', 'Subject', 'Code', 'Faculty', 'Room'];
+    const missing = required.filter(col => !header.includes(col));
+    if (missing.length) {
+        throw new Error(`CSV missing columns: ${missing.join(', ')}`);
+    }
+
+    const idx = {};
+    header.forEach((name, i) => { idx[name] = i; });
+    const seededSemesterIds = new Set();
+    const seededSemestersById = new Map();
+    const semesterCodeById = new Map();
+    const writes = [];
+    const lectureRowsBySemester = {};
+    let lectureCount = 0;
+
+    for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split(',').map(c => c.trim());
+        if (cols.length < header.length) continue;
+
+        const semCode = (cols[idx.Semester] || '').toUpperCase();
+        const semesterId = SEMESTER_ID_MAP[semCode];
+        if (!semesterId) continue;
+
+        const section = (cols[idx.Section] || 'A').toUpperCase();
+        const day = cols[idx.Day] || 'Monday';
+        const startTime = cols[idx.Start] || '09:00';
+        const endTime = cols[idx.End] || '10:00';
+        const subject = cols[idx.Subject] || 'Lecture';
+        const code = cols[idx.Code] || '';
+        const faculty = cols[idx.Faculty] || 'TBD';
+        const room = cols[idx.Room] || 'TBD';
+
+        seededSemesterIds.add(semesterId);
+        seededSemestersById.set(semesterId, {
+            id: semesterId,
+            name: `MCA Semester ${SEMESTER_LABEL_MAP[semCode] || semCode.replace('SEM', '')}`,
+        });
+        semesterCodeById.set(semesterId, semCode);
+
+        if (!lectureRowsBySemester[semesterId]) {
+            lectureRowsBySemester[semesterId] = [];
+        }
+        lectureRowsBySemester[semesterId].push({
+            day,
+            startTime,
+            endTime,
+            subject,
+            code,
+            faculty,
+            room,
+            section,
+        });
+
+        lectureCount++;
+    }
+
+    // Reset existing lecture docs to prevent growing totals on repeated imports.
+    for (const semesterId of seededSemesterIds) {
+        const semesterRef = window.db.collection('semesters').doc(semesterId);
+        writes.push(
+            semesterRef.set({
+                name: seededSemestersById.get(semesterId).name,
+                code: semesterCodeById.get(semesterId) || '',
+                active: true,
+                updatedAt: new Date(),
+            }, { merge: true })
+        );
+    }
+
+    if (!writes.length) throw new Error('No valid lecture rows found in institutional CSV');
+    await Promise.all(writes);
+
+    // Clear existing lectures for each seeded semester (non-archived and archived alike).
+    for (const semesterId of seededSemesterIds) {
+        const semesterRef = window.db.collection('semesters').doc(semesterId);
+        const snapshot = await semesterRef.collection('lectures').get();
+        if (!snapshot.empty) {
+            let batch = window.db.batch();
+            let opCount = 0;
+            for (const doc of snapshot.docs) {
+                batch.delete(doc.ref);
+                opCount++;
+                if (opCount === 450) {
+                    await batch.commit();
+                    batch = window.db.batch();
+                    opCount = 0;
+                }
+            }
+            if (opCount > 0) {
+                await batch.commit();
+            }
+        }
+    }
+
+    // Insert clean lecture set for each seeded semester.
+    for (const semesterId of seededSemesterIds) {
+        const semesterRef = window.db.collection('semesters').doc(semesterId);
+        const rows = lectureRowsBySemester[semesterId] || [];
+        const writeOps = rows.map(row => {
+            const lectureId = `${row.day}_${row.startTime}_${row.section}_${row.code || row.subject}`
+                .toLowerCase()
+                .replace(/[^a-z0-9_]+/g, '_');
+            return semesterRef.collection('lectures').doc(lectureId).set({
+                subject: row.subject,
+                code: row.code,
+                faculty: row.faculty,
+                day: row.day,
+                startTime: row.startTime,
+                endTime: row.endTime,
+                room: row.room,
+                section: row.section,
+                status: 'scheduled',
+                updatedAt: new Date(),
+            });
+        });
+        await Promise.all(writeOps);
+    }
+
+    return {
+        seededSemesterIds: [...seededSemesterIds],
+        seededSemesters: [...seededSemestersById.values()],
+        lectureCount,
+    };
+}
+
 // ============================================================================
 // FACULTY MANAGEMENT
 // ============================================================================
 
 async function loadFacultyList() {
     try {
-        const faculty = await db.collection('semesters').doc(currentSemesterId)
+        const faculty = await window.db.collection('semesters').doc(currentSemesterId)
             .collection('faculty')
             .where('status', '==', 'active')
+            .orderBy('name')
             .get();
 
         const listDiv = document.getElementById('facultyList');
@@ -253,7 +627,7 @@ async function loadFacultyList() {
         listDiv.innerHTML = '';
 
         if (faculty.empty) {
-            listDiv.innerHTML = '<p>No faculty added. Add one to get started.</p>';
+            listDiv.innerHTML = '<p style="color: #666; padding: 15px;">No faculty added yet. Use the form above to add faculty members.</p>';
         } else {
             const table = document.createElement('table');
             table.className = 'data-table';
@@ -262,7 +636,7 @@ async function loadFacultyList() {
                     <th>Name</th>
                     <th>Phone</th>
                     <th>Email</th>
-                    <th>Action</th>
+                    <th>Actions</th>
                 </tr>
             `;
 
@@ -270,10 +644,13 @@ async function loadFacultyList() {
                 const f = doc.data();
                 const row = table.insertRow();
                 row.innerHTML = `
-                    <td>${f.name}</td>
-                    <td>${f.phone}</td>
-                    <td>${f.email}</td>
-                    <td><button onclick="removeFaculty('${doc.id}')" class="danger-btn">Remove</button></td>
+                    <td>${f.name || '—'}</td>
+                    <td>${f.phone || '—'}</td>
+                    <td>${f.email || '—'}</td>
+                    <td style="display: flex; gap: 8px;">
+                        <button onclick="editFaculty('${doc.id}')" class="primary-btn" style="padding: 6px 12px; font-size: 12px;">✏️ Edit</button>
+                        <button onclick="removeFaculty('${doc.id}')" class="danger-btn" style="padding: 6px 12px; font-size: 12px;">Delete</button>
+                    </td>
                 `;
             });
 
@@ -290,23 +667,30 @@ async function showFacultyModal() {
         return;
     }
 
+    cancelEditFaculty();
     document.getElementById('facultyModal').style.display = 'block';
     loadFacultyList();
 }
 
 function closeFacultyModal() {
     document.getElementById('facultyModal').style.display = 'none';
+    cancelEditFaculty();
 }
 
 async function handleAddFaculty(event) {
     event.preventDefault();
 
     try {
-        const name = document.getElementById('facultyName').value;
-        const phone = document.getElementById('facultyPhone').value;
-        const email = document.getElementById('facultyEmail').value;
+        const name = document.getElementById('facultyName').value.trim();
+        const phone = document.getElementById('facultyPhone').value.trim();
+        const email = document.getElementById('facultyEmail').value.trim();
 
-        await db.collection('semesters').doc(currentSemesterId)
+        if (!name || !phone || !email) {
+            showStatus('addFacultyStatus', 'Please fill in all fields', 'warning');
+            return;
+        }
+
+        await window.db.collection('semesters').doc(currentSemesterId)
             .collection('faculty').add({
                 name,
                 phone,
@@ -316,27 +700,144 @@ async function handleAddFaculty(event) {
                 createdAt: new Date(),
             });
 
+        // ====================================================================
+        // SYNC WITH USERS COLLECTION: Ensure faculty can SEE the semester
+        // ====================================================================
+        try {
+            const userQuery = await window.db.collection('users')
+                .where('email', '==', email)
+                .limit(1)
+                .get();
+
+            if (!userQuery.empty) {
+                // User exists, append semester
+                const userDoc = userQuery.docs[0];
+                const existingSems = userDoc.data().semesters || [];
+                if (!existingSems.includes(currentSemesterId)) {
+                    existingSems.push(currentSemesterId);
+                    await userDoc.ref.update({ semesters: existingSems });
+                    console.log(`Updated existing faculty user ${email} with semester ${currentSemesterId}`);
+                }
+            } else {
+                // User doesn't exist, create profile placeholder
+                const facultyId = name.toLowerCase().replace(/[\s.]+/g, '_').replace(/[^a-z_]/g, '');
+                await window.db.collection('users').doc(facultyId).set({
+                    name,
+                    email,
+                    role: 'faculty',
+                    semesters: [currentSemesterId],
+                    facultyId: facultyId,
+                    createdAt: new Date()
+                });
+                console.log(`Created new faculty profile for ${email}`);
+            }
+        } catch (syncErr) {
+            console.error('User sync failed:', syncErr);
+            // Non-blocking but good to know
+        }
+
         document.querySelector('.faculty-form').reset();
         loadFacultyList();
-        showStatus('uploadStatus', `✓ Faculty "${name}" added successfully.`, 'success');
+        showStatus('addFacultyStatus', `✓ Faculty "${name}" added successfully.`, 'success');
+        setTimeout(() => {
+            const statusEl = document.getElementById('addFacultyStatus');
+            if (statusEl) statusEl.textContent = '';
+        }, 3000);
     } catch (error) {
-        showStatus('uploadStatus', `Failed to add faculty: ${error.message}`, 'error');
+        showStatus('addFacultyStatus', `Failed to add faculty: ${error.message}`, 'error');
     }
 }
 
-async function removeFaculty(facultyId) {
-    if (!confirm('Remove this faculty?')) return;
+async function editFaculty(facultyId) {
+    try {
+        const docSnap = await window.db.collection('semesters').doc(currentSemesterId)
+            .collection('faculty').doc(facultyId).get();
+
+        if (!docSnap.exists) {
+            showError('Faculty not found');
+            return;
+        }
+
+        const data = docSnap.data();
+        
+        // Populate edit form
+        document.getElementById('editFacultyId').value = facultyId;
+        document.getElementById('editFacultyName').value = data.name || '';
+        document.getElementById('editFacultyPhone').value = data.phone || '';
+        document.getElementById('editFacultyEmail').value = data.email || '';
+
+        // Show edit section
+        document.getElementById('editFacultySection').style.display = 'block';
+        document.getElementById('editFacultyName').focus();
+
+        // Scroll to top
+        document.querySelector('.modal-content').scrollTop = 0;
+    } catch (error) {
+        showError(`Error loading faculty: ${error.message}`);
+    }
+}
+
+async function handleEditFaculty(event) {
+    event.preventDefault();
 
     try {
-        await db.collection('semesters').doc(currentSemesterId)
+        const facultyId = document.getElementById('editFacultyId').value;
+        const name = document.getElementById('editFacultyName').value.trim();
+        const phone = document.getElementById('editFacultyPhone').value.trim();
+        const email = document.getElementById('editFacultyEmail').value.trim();
+
+        if (!name || !phone || !email) {
+            showError('Please fill in all fields');
+            return;
+        }
+
+        await window.db.collection('semesters').doc(currentSemesterId)
             .collection('faculty').doc(facultyId).update({
-                status: 'inactive',
+                name,
+                phone,
+                email,
+                updatedAt: new Date(),
             });
 
+        cancelEditFaculty();
         loadFacultyList();
-        showStatus('uploadStatus', '✓ Faculty removed.', 'success');
+        const statusEl = document.getElementById('addFacultyStatus');
+        showStatus('addFacultyStatus', `✓ Faculty "${name}" updated successfully.`, 'success');
+        setTimeout(() => {
+            if (statusEl) statusEl.textContent = '';
+        }, 3000);
     } catch (error) {
-        showStatus('uploadStatus', `Error: ${error.message}`, 'error');
+        showError(`Error updating faculty: ${error.message}`);
+    }
+}
+
+function cancelEditFaculty() {
+    document.getElementById('editFacultySection').style.display = 'none';
+    document.getElementById('editFacultyId').value = '';
+    document.getElementById('editFacultyName').value = '';
+    document.getElementById('editFacultyPhone').value = '';
+    document.getElementById('editFacultyEmail').value = '';
+}
+
+async function removeFaculty(facultyId) {
+    if (!confirm('Remove this faculty member? This action cannot be undone.')) return;
+
+    try {
+        await window.db.collection('semesters').doc(currentSemesterId)
+            .collection('faculty').doc(facultyId).update({
+                status: 'inactive',
+                deletedAt: new Date(),
+            });
+
+        cancelEditFaculty();
+        loadFacultyList();
+        showStatus('addFacultyStatus', '✓ Faculty member removed.', 'success');
+        setTimeout(() => {
+            const statusEl = document.getElementById('addFacultyStatus');
+            if (statusEl) statusEl.textContent = '';
+        }, 3000);
+    } catch (error) {
+        showStatus('addFacultyStatus', `Error: ${error.message}`, 'error');
     }
 }
 
@@ -412,7 +913,7 @@ async function showNotificationLog() {
     }
 
     try {
-        const notifications = await db.collection('semesters').doc(currentSemesterId)
+        const notifications = await window.db.collection('semesters').doc(currentSemesterId)
             .collection('notifications')
             .orderBy('sentAt', 'desc')
             .limit(50)
@@ -464,7 +965,7 @@ async function showMessageLog() {
     }
 
     try {
-        const messages = await db.collection('message_logs')
+        const messages = await window.db.collection('message_logs')
             .where('semesterId', '==', currentSemesterId)
             .orderBy('timestamp', 'desc')
             .limit(200)
@@ -555,25 +1056,25 @@ async function confirmArchiveSemester() {
         showStatus('archiveStatus', 'Archiving semester...', 'info');
 
         // Mark semester as inactive
-        await db.collection('semesters').doc(currentSemesterId).update({
+        await window.db.collection('semesters').doc(currentSemesterId).update({
             active: false,
         });
 
         // Mark all lectures as archived
-        const lectures = await db.collection('semesters').doc(currentSemesterId)
+        const lectures = await window.db.collection('semesters').doc(currentSemesterId)
             .collection('lectures').get();
 
-        const batch = db.batch();
+        const batch = window.db.batch();
         lectures.forEach(doc => {
             batch.update(doc.ref, { status: 'archived' });
         });
         await batch.commit();
 
         // Mark all students as archived
-        const students = await db.collection('semesters').doc(currentSemesterId)
+        const students = await window.db.collection('semesters').doc(currentSemesterId)
             .collection('students').get();
 
-        const batch2 = db.batch();
+        const batch2 = window.db.batch();
         students.forEach(doc => {
             batch2.update(doc.ref, { status: 'archived' });
         });
@@ -592,7 +1093,7 @@ async function confirmArchiveSemester() {
 
 async function showSettingsModal() {
     try {
-        const settings = await db.collection('admin_settings').doc('config').get();
+        const settings = await window.db.collection('admin_settings').doc('config').get();
 
         if (settings.exists) {
             const data = settings.data();
@@ -623,7 +1124,7 @@ async function handleSettingsSave(event) {
             credentialDeliveryMethod: document.getElementById('deliveryMethod').value,
         };
 
-        await db.collection('admin_settings').doc('config').set(settings, { merge: true });
+        await window.db.collection('admin_settings').doc('config').set(settings, { merge: true });
 
         showStatus('uploadStatus', '✓ Settings saved.', 'success');
         closeSettingsModal();
@@ -650,8 +1151,8 @@ function showError(message) {
 }
 
 function logout() {
-    auth.signOut().then(() => {
-        window.location.href = 'login.html';
+    window.auth.signOut().then(() => {
+        window.location.href = '/pages/login.html';
     }).catch(error => {
         showError(error.message);
     });

@@ -1,0 +1,104 @@
+/* Chat UI Component Styles */
+
+.chat-box {
+    height: 400px;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 15px 0;
+    scroll-behavior: smooth;
+}
+
+.message {
+    max-width: 80%;
+    padding: 10px 15px;
+    border-radius: 18px;
+    position: relative;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.message.sent {
+    align-self: flex-end;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: white;
+    border-bottom-right-radius: 2px;
+}
+
+.message.received {
+    align-self: flex-start;
+    background: #334155;
+    color: #e2e8f0;
+    border-bottom-left-radius: 2px;
+}
+
+.msg-sender {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    margin-bottom: 2px;
+    font-weight: 600;
+}
+
+.msg-time {
+    font-size: 0.7rem;
+    opacity: 0.6;
+    margin-top: 4px;
+    text-align: right;
+}
+
+.chat-input-form {
+    display: flex;
+    gap: 10px;
+}
+
+.chat-input-form input,
+.chat-input-form textarea {
+    flex: 1;
+    padding: 12px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+    resize: none;
+}
+
+.chat-input-form .send-btn {
+    background: #6366f1;
+    color: white;
+    border: none;
+    padding: 0 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.chat-input-form .send-btn:hover {
+    background: #4f46e5;
+}
+
+.chat-filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.chat-filters select {
+    padding: 8px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: white;
+    border-radius: 6px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

@@ -3,7 +3,7 @@
 // ============================================================================
 
 (function () {
-    const { auth, db } = window.firebaseApp;
+    // Firebase services are available as window.auth and window.db
     let selectedRole = 'student';
 
     // ============================================================================
@@ -13,7 +13,7 @@
     document.addEventListener('DOMContentLoaded', async () => {
         // Load support contact
         try {
-            const settings = await db.collection('admin_settings').doc('config').get();
+            const settings = await window.db.collection('admin_settings').doc('config').get();
             if (settings.exists) {
                 document.getElementById('supportContact').textContent =
                     settings.data().supportEmail || 'support@institution.edu';
@@ -33,7 +33,7 @@
         });
 
         // Check if already logged in
-        auth.onAuthStateChanged((user) => {
+        window.auth.onAuthStateChanged((user) => {
             if (user) {
                 redirectToDashboard(user.uid);
             }
@@ -88,13 +88,13 @@
 
         try {
             // Sign in with Firebase Auth (UID = enrollment number)
-            const credential = await auth.signInWithEmailAndPassword(
+            const credential = await window.auth.signInWithEmailAndPassword(
                 `${enrollmentNo}@lec-scheduler.local`,
                 password
             );
 
             // Get user role and semester
-            const userDoc = await db.collection('users').doc(credential.user.uid).get();
+            const userDoc = await window.db.collection('users').doc(credential.user.uid).get();
 
             if (!userDoc.exists) {
                 throw new Error('User data not found. Please contact support.');
@@ -106,15 +106,8 @@
                 throw new Error('Access denied. Invalid credentials for student login.');
             }
 
-            // Check if password needs to be changed
-            if (!userData.passwordChanged) {
-                // Redirect to password change page
-                sessionStorage.setItem('needsPasswordChange', 'true');
-                window.location.href = 'change-password.html';
-            } else {
-                // Redirect to student dashboard
-                redirectToDashboard(credential.user.uid);
-            }
+            // Redirect directly to student dashboard
+            redirectToDashboard(credential.user.uid);
         } catch (error) {
             if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
                 throw new Error('Invalid enrollment number or password. Check the credentials sent to your phone.');
@@ -136,10 +129,10 @@
         }
 
         try {
-            const credential = await auth.signInWithEmailAndPassword(email, password);
+            const credential = await window.auth.signInWithEmailAndPassword(email, password);
 
             // Verify role
-            const userDoc = await db.collection('users').doc(credential.user.uid).get();
+            const userDoc = await window.db.collection('users').doc(credential.user.uid).get();
 
             if (!userDoc.exists) {
                 throw new Error('Faculty account not found.');
@@ -171,10 +164,10 @@
         }
 
         try {
-            const credential = await auth.signInWithEmailAndPassword(email, password);
+            const credential = await window.auth.signInWithEmailAndPassword(email, password);
 
             // Verify role
-            const userDoc = await db.collection('users').doc(credential.user.uid).get();
+            const userDoc = await window.db.collection('users').doc(credential.user.uid).get();
 
             if (!userDoc.exists) {
                 throw new Error('Admin account not found.');
@@ -199,15 +192,15 @@
 
     async function redirectToDashboard(uid) {
         try {
-            const userDoc = await db.collection('users').doc(uid).get();
+            const userDoc = await window.db.collection('users').doc(uid).get();
             const role = userDoc.data().role;
 
             if (role === 'student') {
-                window.location.href = 'student.html';
+                window.location.href = '/pages/student.html';
             } else if (role === 'faculty') {
-                window.location.href = 'faculty.html';
+                window.location.href = '/pages/faculty.html';
             } else if (role === 'admin') {
-                window.location.href = 'admin.html';
+                window.location.href = '/pages/admin.html';
             }
         } catch (error) {
             throw new Error(`Failed to determine user role: ${error.message}`);

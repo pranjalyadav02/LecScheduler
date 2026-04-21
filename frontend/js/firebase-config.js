@@ -14,13 +14,22 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
 
-// Initialize services
-const auth = firebase.auth();
-const db = firebase.firestore();
-const storage = firebase.storage();
-const functions = firebase.functions();
+// Initialize services (ensuring single initialization)
+if (!window.db) {
+    window.auth = firebase.auth();
+    window.db = firebase.firestore();
+    window.storage = (typeof firebase.storage === "function") ? firebase.storage() : null;
+    window.functions = firebase.functions();
+}
+
+const authService = window.auth;
+const dbService = window.db;
+const storageService = window.storage;
+const functionsService = window.functions;
 
 // ============================================================================
 // EMULATOR DETECTION (Development Mode) - DISABLED FOR NOW (Java required)
@@ -41,23 +50,37 @@ const functions = firebase.functions();
 //     functions.useEmulator('127.0.0.1', 5001);
 // }
 
-// Enable offline persistence (for data caching)
-db.enablePersistence().catch((err) => {
-    if (err.code == 'failed-precondition') {
-        console.log('Multiple tabs open, persistence can only be enabled in one tab at a time.');
-    } else if (err.code == 'unimplemented') {
-        console.log('The current browser does not support all of the features required to enable persistence');
-    }
-});
+// Enable offline persistence
+try {
+    dbService.enablePersistence().then(() => {
+        console.log('✓ Firestore offline persistence enabled');
+    }).catch(err => {
+        if (err.code === 'failed-precondition') {
+            console.log('Multiple tabs open; offline persistence disabled');
+        } else if (err.code === 'unimplemented') {
+            console.log('Browser does not support offline persistence');
+        } else {
+            console.log('Offline persistence error:', err.message);
+        }
+    });
+} catch (err) {
+    console.log('Could not enable offline persistence:', err.message);
+}
 
 // Make services globally available
 window.firebaseApp = {
-    auth,
-    db,
-    storage,
-    functions,
+    auth: authService,
+    db: dbService,
+    storage: storageService,
+    functions: functionsService,
     firebase
 };
+
+// Also expose them as window globals for convenience (will be available after this script loads)
+window.auth = authService;
+window.db = dbService;
+window.storage = storageService;
+window.functions = functionsService;
 
 // Expose a promise that resolves when firebase is initialized
 window.firebaseReady = (async function waitForInit() {

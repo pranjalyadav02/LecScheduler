@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LecScheduler - Master Expanded Seeder</title>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #0f172a; color: white; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .card { background: #1e293b; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; max-width: 500px; border: 1px solid #334155; }
+        h1 { margin-bottom: 0.5rem; color: #38bdf8; }
+        p { color: #94a3b8; line-height: 1.6; }
+        .btn { background: #38bdf8; color: #0f172a; border: none; padding: 1rem 2rem; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 1rem; width: 100%; }
+        .btn:hover { background: #0ea5e9; transform: translateY(-2px); }
+        #status { margin-top: 1.5rem; font-family: monospace; text-align: left; background: #000; padding: 1rem; border-radius: 6px; font-size: 0.8rem; overflow-y: auto; max-height: 200px; color: #4ade80; border: 1px solid #334155; display: none; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🚀 Data Expansion Engine</h1>
+        <p>This tool will explicitly expand your <b>compressed PDF pairs</b> (Mon-Tue, etc.) into a full <b>Multi-Semester 6-Day Schedule</b> in Firestore.</p>
+        
+        <button class="btn" id="runBtn">START MASTER EXPANSION</button>
+        <div id="status"></div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+
+    <script>
+        const log = (msg) => {
+            const s = document.getElementById('status');
+            s.style.display = 'block';
+            s.innerHTML += `<div>> ${msg}</div>`;
+            s.scrollTop = s.scrollHeight;
+        };
+
+        const RAW_DATA = {
+            'mca_semester_ii': {
+                'A': [
+                    { dayGroup: 'Mon-Tue', startTime: '11:00', endTime: '13:00', subject: 'C++ Lab', facultyId: 'mr_dheeraj_upadhayay', room: 'Lab 1' },
+                    { dayGroup: 'Mon-Tue', startTime: '13:00', endTime: '14:00', subject: 'IWP', facultyId: 'ms_ragini_modi', room: 'CR 101' },
+                    { dayGroup: 'Mon-Tue', startTime: '14:00', endTime: '15:00', subject: 'DCO', facultyId: 'dr_rajesh_verma', room: 'CR 101' },
+                    { dayGroup: 'Mon-Tue', startTime: '15:00', endTime: '16:00', subject: 'Hindi', facultyId: 'dr_pushpendra_dubey', room: 'CR 101' },
+                    { dayGroup: 'Mon-Tue', startTime: '16:00', endTime: '17:00', subject: 'Mathematics-II', facultyId: 'mr_hemant_gavde', room: 'CR 101' },
+                    { dayGroup: 'Wed-Thu', startTime: '13:00', endTime: '14:00', subject: 'OOPs (C++)', facultyId: 'ms_shraddha_soni', room: 'CR 102' },
+                    { dayGroup: 'Wed-Thu', startTime: '14:00', endTime: '15:00', subject: 'Mathematics-II', facultyId: 'mr_hemant_gavde', room: 'CR 102' },
+                    { dayGroup: 'Wed-Thu', startTime: '15:00', endTime: '16:00', subject: 'Hindi', facultyId: 'dr_pushpendra_dubey', room: 'CR 102' },
+                    { dayGroup: 'Wed-Thu', startTime: '16:00', endTime: '17:00', subject: 'IWP', facultyId: 'ms_ragini_modi', room: 'CR 102' },
+                    { dayGroup: 'Fri-Sat', startTime: '13:00', endTime: '14:00', subject: 'OOPs (C++)', facultyId: 'ms_shraddha_soni', room: 'CR 103' },
+                    { dayGroup: 'Fri-Sat', startTime: '14:00', endTime: '15:00', subject: 'DCO', facultyId: 'dr_rajesh_verma', room: 'CR 103' },
+                    { dayGroup: 'Fri-Sat', startTime: '15:00', endTime: '17:00', subject: 'IWP Lab', facultyId: 'mr_anshul_satle', room: 'Lab 2' }
+                ],
+                'B': [
+                    { dayGroup: 'Mon-Tue', startTime: '11:00', endTime: '13:00', subject: 'IWP Lab', facultyId: 'mr_anshul_satle', room: 'Lab 2' },
+                    { dayGroup: 'Wed-Thu', startTime: '14:00', endTime: '16:00', subject: 'C++ Lab', facultyId: 'mr_dheeraj_upadhayay', room: 'Lab 1' },
+                    { dayGroup: 'Fri-Sat', startTime: '11:00', endTime: '12:00', subject: 'DCO', facultyId: 'dr_rajesh_verma', room: 'CR 101' }
+                ]
+            },
+            'mca_semester_iv': {
+                'A': [
+                    { dayGroup: 'Mon-Tue', startTime: '11:00', endTime: '13:00', subject: 'Cloud Computing Lab', facultyId: 'dr_amit_jain', room: 'Lab 3' },
+                    { dayGroup: 'Wed-Thu', startTime: '11:00', endTime: '12:00', subject: 'Adv Java', facultyId: 'mr_sanjay_sharma', room: 'CR 201' },
+                    { dayGroup: 'Fri-Sat', startTime: '14:00', endTime: '16:00', subject: 'ML Basics', facultyId: 'dr_shubham_singh', room: 'CR 201' }
+                ],
+                'B': [
+                    { dayGroup: 'Mon-Tue', startTime: '13:00', endTime: '15:00', subject: 'Adv Java Lab', facultyId: 'mr_sanjay_sharma', room: 'Lab 4' }
+                ]
+            }
+        };
+
+        document.getElementById('runBtn').onclick = async () => {
+            document.getElementById('runBtn').disabled = true;
+            document.getElementById('runBtn').innerText = 'EXPANDING...';
+            log('Initializing expansion...');
+
+            try {
+                for (const semId in RAW_DATA) {
+                    log(`Processing ${semId.replace(/_/g, ' ').toUpperCase()}...`);
+                    
+                    for (const section in RAW_DATA[semId]) {
+                        log(`--> Expanding Section ${section}...`);
+                        
+                        // Clear old records for this section
+                        const snap = await db.collection('semesters').doc(semId).collection('lectures').where('section', '==', section).get();
+                        const batch = db.batch();
+                        snap.docs.forEach(doc => batch.delete(doc.ref));
+                        await batch.commit();
+
+                        const finalBatch = db.batch();
+                        let total = 0;
+
+                        for (const lec of RAW_DATA[semId][section]) {
+                            let days = [];
+                            if (lec.dayGroup === 'Mon-Tue') days = ['Monday', 'Tuesday'];
+                            if (lec.dayGroup === 'Wed-Thu') days = ['Wednesday', 'Thursday'];
+                            if (lec.dayGroup === 'Fri-Sat') days = ['Friday', 'Saturday'];
+
+                            for (const day of days) {
+                                const ref = db.collection('semesters').doc(semId).collection('lectures').doc();
+                                finalBatch.set(ref, {
+                                    day,
+                                    startTime: lec.startTime,
+                                    endTime: lec.endTime,
+                                    subject: lec.subject,
+                                    facultyId: lec.facultyId,
+                                    room: lec.room,
+                                    section,
+                                    status: 'scheduled',
+                                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                                });
+                                total++;
+                            }
+                        }
+                        await finalBatch.commit();
+                        log(`Successfully expanded into ${total} individual days.`);
+                    }
+                }
+                log('✨ MASTER EXPANSION COMPLETE!');
+                document.getElementById('runBtn').innerText = 'COMPLETED SUCCESS';
+            } catch (e) {
+                log(`❌ ERROR: ${e.message}`);
+                console.error(e);
+            }
+        };
+    </script>
+</body>
+</html>

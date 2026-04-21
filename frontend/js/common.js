@@ -3,8 +3,8 @@
 // Shared helpers, status messages, logout, etc.
 // ============================================================================
 
-// The firebase-config.js script sets window.firebaseApp with { auth, db, storage, functions }
-const { auth, db, storage, functions } = window.firebaseApp || {};
+// Firebase services are exposed as window.auth, window.db, window.storage, window.functions
+// They are initialized by firebase-config.js which loads before this file
 
 /**
  * Show a status message in the page.
@@ -43,12 +43,12 @@ function showError(message) {
  * Sign the current user out and send them to login page.
  */
 function logout() {
-    if (!auth) {
-        window.location.href = 'login.html';
+    if (!window.auth) {
+        window.location.href = '/pages/login.html';
         return;
     }
-    auth.signOut().then(() => {
-        window.location.href = 'login.html';
+    window.auth.signOut().then(() => {
+        window.location.href = '/pages/login.html';
     }).catch(showError);
 }
 
@@ -58,4 +58,3 @@ window.showError = showError;
 window.logout = logout;
 
 // Optionally export other helpers in future
-```

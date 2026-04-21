@@ -3,14 +3,20 @@
 // Caches timetable data and enables offline viewing
 // ============================================================================
 
-const CACHE_NAME = 'lec-scheduler-v1';
+const CACHE_NAME = 'lec-scheduler-v2';
 const urlsToCache = [
-    '/',
-    '/pages/login.html',
-    '/pages/student.html',
-    '/css/admin.css',
-    '/js/firebase-config.js',
-    '/js/student.js',
+    './',
+    './pages/login.html',
+    './pages/admin.html',
+    './pages/faculty.html',
+    './pages/student.html',
+    './css/admin.css',
+    './js/firebase-config.js',
+    './js/common.js',
+    './js/chat.js',
+    './js/admin.js',
+    './js/faculty.js',
+    './js/student.js',
 ];
 
 // Install service worker and cache essential files

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LecScheduler - Seed Timetable Data</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+        }
+        h1 { color: #333; margin-bottom: 10px; font-size: 28px; }
+        .subtitle { color: #666; margin-bottom: 30px; }
+        button { 
+            width: 100%;
+            background: #4CAF50;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        button:hover { background: #45a049; }
+        button:disabled { background: #cccccc; cursor: not-allowed; }
+        .status { 
+            margin-top: 30px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+        }
+        .status.show { display: block; }
+        .status.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .status.info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .spinner { display: inline-block; margin-right: 10px; }
+        .stats { margin-top: 20px; }
+        .stat-item { margin: 8px 0; font-size: 14px; }
+        .check { color: #28a745; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 LecScheduler</h1>
+        <p class="subtitle">Seed Default Timetable Data</p>
+        
+        <button id="seedBtn" onclick="seedData()">📊 Create Default Timetable Data</button>
+        
+        <div id="status" class="status">
+            <div id="statusText"></div>
+            <div id="stats" class="stats"></div>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase Configuration (from your firebase-config.js)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDraOcEe3NMokWlhPtEQyXi8vg09MsZjMc",
+            authDomain: "lecscheduler-4e36b.firebaseapp.com",
+            projectId: "lecscheduler-4e36b",
+            storageBucket: "lecscheduler-4e36b.firebasestorage.app",
+            messagingSenderId: "114388534580",
+            appId: "1:114388534580:web:971a79bcfef075d7985161",
+            measurementId: "G-90W2DL6GQN"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const statusDiv = document.getElementById('status');
+        const statusText = document.getElementById('statusText');
+        const statsDiv = document.getElementById('stats');
+        const seedBtn = document.getElementById('seedBtn');
+
+        function showStatus(message, type = 'info') {
+            statusText.innerHTML = message;
+            statusDiv.className = 'status show ' + type;
+        }
+
+        function showStat(label, value) {
+            const statItem = document.createElement('div');
+            statItem.className = 'stat-item';
+            statItem.innerHTML = `<span class="check">✓</span> ${label}: ${value}`;
+            statsDiv.appendChild(statItem);
+        }
+
+        async function seedData() {
+            seedBtn.disabled = true;
+            statusDiv.className = 'status show info';
+            statsDiv.innerHTML = '';
+            showStatus('⏳ Seeding data... please wait...');
+
+            try {
+                const semesterId = 'mca-sem1-jan2026';
+                
+                // 1. Create Semester
+                await db.collection('semesters').doc(semesterId).set({
+                    name: 'MCA Semester 1 (Jan-May 2026)',
+                    startDate: new Date('2026-01-15'),
+                    endDate: new Date('2026-05-30'),
+                    status: 'active',
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                });
+                showStat('Semester', 'Created');
+
+                // 2. Create Faculty
+                const facultyData = {
+                    'rajesh': { name: 'Dr. Rajesh Verma', email: 'dr_rajesh_verma@college.ac.in', phone: '9876543210' },
+                    'kumar': { name: 'Prof. Kumar Singh', email: 'kumar.singh@college.ac.in', phone: '9876543211' },
+                    'sharma': { name: 'Dr. Sharma Patel', email: 'sharma.patel@college.ac.in', phone: '9876543212' },
+                    'gupta': { name: 'Prof. Gupta', email: 'gupta@college.ac.in', phone: '9876543213' },
+                    'mishra': { name: 'Dr. Mishra', email: 'mishra@college.ac.in', phone: '9876543214' },
+                    'rao': { name: 'Prof. Rao', email: 'rao@college.ac.in', phone: '9876543215' }
+                };
+
+                for (const [key, data] of Object.entries(facultyData)) {
+                    await db.collection('semesters').doc(semesterId).collection('faculty').doc(key).set({
+                        name: data.name,
+                        email: data.email,
+                        phone: data.phone,
+                        status: 'active',
+                        createdAt: new Date()
+                    });
+                }
+                showStat('Faculty', Object.keys(facultyData).length + ' created');
+
+                // 3. Create Lectures
+                const lectures = [
+                    { subject: 'Object Oriented Programming', faculty: 'Dr. Rajesh Verma', day: 'Monday', startTime: '09:00', endTime: '10:30', room: 'A-101' },
+                    { subject: 'Database Management', faculty: 'Prof. Kumar Singh', day: 'Monday', startTime: '11:00', endTime: '12:30', room: 'B-205' },
+                    { subject: 'Web Development', faculty: 'Dr. Sharma Patel', day: 'Tuesday', startTime: '09:00', endTime: '10:30', room: 'C-301' },
+                    { subject: 'Advanced Java', faculty: 'Prof. Gupta', day: 'Tuesday', startTime: '11:00', endTime: '12:30', room: 'A-102' },
+                    { subject: 'Data Structures', faculty: 'Dr. Mishra', day: 'Wednesday', startTime: '09:00', endTime: '10:30', room: 'B-206' },
+                    { subject: 'Network Security', faculty: 'Prof. Rao', day: 'Wednesday', startTime: '11:00', endTime: '12:30', room: 'C-302' },
+                    { subject: 'Cloud Computing', faculty: 'Dr. Rajesh Verma', day: 'Thursday', startTime: '09:00', endTime: '10:30', room: 'A-103' },
+                    { subject: 'Mobile App Development', faculty: 'Prof. Kumar Singh', day: 'Thursday', startTime: '11:00', endTime: '12:30', room: 'B-207' },
+                    { subject: 'AI & Machine Learning', faculty: 'Dr. Sharma Patel', day: 'Friday', startTime: '09:00', endTime: '10:30', room: 'C-303' },
+                    { subject: 'Software Engineering', faculty: 'Prof. Gupta', day: 'Friday', startTime: '11:00', endTime: '12:30', room: 'A-104' }
+                ];
+
+                let lectureCount = 0;
+                for (const lecture of lectures) {
+                    const lectureId = lecture.day.substring(0,3).toLowerCase() + '-' + lecture.startTime.replace(':', '') + '-' + lecture.subject.toLowerCase().replace(/\s+/g, '-');
+                    
+                    await db.collection('semesters').doc(semesterId).collection('lectures').doc(lectureId).set({
+                        subject: lecture.subject,
+                        faculty: lecture.faculty,
+                        day: lecture.day,
+                        startTime: lecture.startTime,
+                        endTime: lecture.endTime,
+                        room: lecture.room,
+                        status: 'scheduled',
+                        createdFrom: 'auto-seed',
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                        capacity: 60,
+                        enrolled: 0
+                    });
+                    lectureCount++;
+                }
+                showStat('Lectures', lectureCount + ' created');
+
+                // 4. Create Students
+                const students = [
+                    { enrollmentNo: 'MCA2026001', name: 'Priya Sharma', email: 'priya@college.ac.in' },
+                    { enrollmentNo: 'MCA2026002', name: 'Arun Kumar', email: 'arun@college.ac.in' },
+                    { enrollmentNo: 'MCA2026003', name: 'Deepika Singh', email: 'deepika@college.ac.in' },
+                    { enrollmentNo: 'MCA2026004', name: 'Rohit Patel', email: 'rohit@college.ac.in' },
+                    { enrollmentNo: 'MCA2026005', name: 'Nisha Gupta', email: 'nisha@college.ac.in' }
+                ];
+
+                for (const student of students) {
+                    await db.collection('semesters').doc(semesterId).collection('students').doc(student.enrollmentNo).set({
+                        name: student.name,
+                        email: student.email,
+                        enrollmentNo: student.enrollmentNo,
+                        status: 'active',
+                        createdAt: new Date()
+                    });
+                }
+                showStat('Students', students.length + ' created');
+
+                // Success!
+                statusDiv.className = 'status show success';
+                statusText.innerHTML = '<h2>✅ Timetable Data Seeded Successfully!</h2><p>You can now close this page and refresh your admin portal.</p>';
+
+            } catch (error) {
+                statusDiv.className = 'status show error';
+                statusText.innerHTML = '<h2>❌ Error</h2><p>' + error.message + '</p><p style="font-size: 12px; margin-top: 10px;">' + error.code + '</p>';
+                console.error('Seeding error:', error);
+            } finally {
+                seedBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

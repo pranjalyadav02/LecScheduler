@@ -4,7 +4,8 @@
 
 let currentSemesterId = null;
 let currentFacultyId = null;
-const { db, auth, functions } = window.firebaseApp;
+let assignedSemesters = [];
+// Firebase services are available as window.auth, window.db, window.storage, window.functions
 
 // ============================================================================
 // INITIALIZATION
@@ -12,33 +13,52 @@ const { db, auth, functions } = window.firebaseApp;
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        auth.onAuthStateChanged(async (user) => {
+        window.auth.onAuthStateChanged(async (user) => {
             if (!user) {
-                window.location.href = 'login.html';
+                window.location.href = '/pages/login.html';
                 return;
             }
 
             // Load faculty data
-            const userDoc = await db.collection('users').doc(user.uid).get();
+            const userDoc = await window.db.collection('users').doc(user.uid).get();
             if (!userDoc.exists || userDoc.data().role !== 'faculty') {
                 showError('Unauthorized. Faculty access required.');
                 setTimeout(() => logout(), 2000);
                 return;
             }
 
-            document.getElementById('facultyName').textContent = user.displayName || 'Faculty';
-            currentFacultyId = user.uid;
+            document.getElementById('facultyName').textContent = userDoc.data().displayName || user.displayName || 'Faculty';
+            // Use the facultyId slug from the user doc
+            currentFacultyId = userDoc.data().facultyId || userDoc.data().displayName?.toLowerCase().replace(/[\s.]+/g, '_').replace(/[^a-z_]/g, '') || user.uid;
 
-            // Get first semester for now (simplification)
-            const semesters = userDoc.data().semesters || [];
-            if (semesters.length > 0) {
-                currentSemesterId = semesters[0];
-                await loadSemesterInfo();
-                await loadMyLecturesForSelect();
-                await loadSubjectsForChat();
-                await loadMessageRequests();
+            assignedSemesters = userDoc.data().semesters || [];
+            if (assignedSemesters.length > 0) {
+                // Populate Dashboard Semester Select
+                const dashSem = document.getElementById('dashSemSelect');
+                if (dashSem) {
+                    dashSem.innerHTML = '';
+                    assignedSemesters.forEach(sem => {
+                        const opt = document.createElement('option');
+                        opt.value = sem;
+                        opt.textContent = sem.replace(/_/g, ' ').toUpperCase();
+                        dashSem.appendChild(opt);
+                    });
+                }
+
+                currentSemesterId = assignedSemesters[0];
+                await refreshDashboard();
+                
+                // Keep Chat Semester sync
+                const chatSem = document.getElementById('chatSemSelect');
+                if (chatSem) {
+                    chatSem.innerHTML = dashSem ? dashSem.innerHTML : '';
+                    chatSem.value = currentSemesterId;
+                    switchChat();
+                }
             } else {
                 showError('No semester assigned to you.');
+                const dashSem = document.getElementById('dashSemSelect');
+                if (dashSem) dashSem.innerHTML = '<option value="">None Assigned</option>';
             }
         });
     } catch (error) {
@@ -50,49 +70,80 @@ document.addEventListener('DOMContentLoaded', async () => {
 // SEMESTER & LECTURES
 // ============================================================================
 
-async function loadSemesterInfo() {
-    try {
-        const semesterDoc = await db.collection('semesters').doc(currentSemesterId).get();
-        if (semesterDoc.exists) {
-            document.getElementById('semesterDisplay').textContent = 
-                `Semester: ${semesterDoc.data().name}`;
-        }
-    } catch (error) {
-        console.error('Error loading semester:', error);
+async function onDashboardSemesterChange() {
+    currentSemesterId = document.getElementById('dashSemSelect').value;
+    // Sync with chat select if it exists
+    const chatSem = document.getElementById('chatSemSelect');
+    if (chatSem) {
+        chatSem.value = currentSemesterId;
+        switchChat();
     }
+    await refreshDashboard();
+}
+
+/**
+ * Refresh all dashboard components for the current semester.
+ */
+async function refreshDashboard() {
+    if (!currentSemesterId) return;
+    
+    // Reset section filter when semester changes to avoid "mixing"
+    const dashSec = document.getElementById('dashSecSelect');
+    if (dashSec) dashSec.value = '';
+
+    await updateTeachingSummary();
+    await loadMyLecturesForSelect();
 }
 
 async function loadMyLecturesForSelect() {
     try {
-        const lectures = await db.collection('semesters').doc(currentSemesterId)
+        const selectedSec = document.getElementById('dashSecSelect')?.value;
+        
+        let query = window.db.collection('semesters').doc(currentSemesterId)
             .collection('lectures')
-            .where('faculty', '==', currentFacultyId)
-            .where('status', '!=', 'cancelled')
-            .where('status', '!=', 'archived')
-            .orderBy('status')
-            .orderBy('day')
-            .get();
+            .where('facultyId', '==', currentFacultyId);
+        
+        if (selectedSec) {
+            query = query.where('section', '==', selectedSec);
+        }
 
-        // Populate cancel and reschedule selects
+        const snapshot = await query.get();
+        
+        // Sort manually by day and time to avoid index requirement
+        const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const lectures = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+            .sort((a, b) => {
+                const dayDiff = dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day);
+                if (dayDiff !== 0) return dayDiff;
+                return (a.startTime || '').localeCompare(b.startTime || '');
+            });
+
         const cancelSelect = document.getElementById('cancelLectureSelect');
         const rescheduleSelect = document.getElementById('rescheduleLectureSelect');
 
         cancelSelect.innerHTML = '<option value="">-- Select Lecture --</option>';
         rescheduleSelect.innerHTML = '<option value="">-- Select Lecture --</option>';
 
-        lectures.forEach(doc => {
-            const lecture = doc.data();
-            const optionText = `${lecture.subject} - ${lecture.day} ${lecture.startTime} (${lecture.room})`;
+        lectures.forEach(lecture => {
+            const sectionStr = lecture.section ? `[Sec ${lecture.section}]` : '';
+            const statusStr = lecture.status === 'cancelled' ? ' (CANCELLED)' : '';
+            const optionText = `${lecture.subject} ${sectionStr} - ${lecture.day} ${lecture.startTime} (${lecture.room})${statusStr}`;
             
-            const opt1 = document.createElement('option');
-            opt1.value = doc.id;
-            opt1.textContent = optionText;
-            cancelSelect.appendChild(opt1);
+            // Only show scheduled lectures in the cancel dropdown
+            if (lecture.status === 'scheduled') {
+                const opt1 = document.createElement('option');
+                opt1.value = lecture.id;
+                opt1.textContent = optionText;
+                cancelSelect.appendChild(opt1);
+            }
 
-            const opt2 = document.createElement('option');
-            opt2.value = doc.id;
-            opt2.textContent = optionText;
-            rescheduleSelect.appendChild(opt2);
+            // Show both scheduled and cancelled lectures in the reschedule dropdown
+            if (lecture.status === 'scheduled' || lecture.status === 'cancelled') {
+                const opt2 = document.createElement('option');
+                opt2.value = lecture.id;
+                opt2.textContent = optionText;
+                rescheduleSelect.appendChild(opt2);
+            }
         });
     } catch (error) {
         console.error('Error loading lectures:', error);
@@ -103,12 +154,25 @@ async function showMyLectures() {
     if (!currentSemesterId) return;
 
     try {
-        const lectures = await db.collection('semesters').doc(currentSemesterId)
+        const selectedSec = document.getElementById('dashSecSelect')?.value;
+        
+        let query = window.db.collection('semesters').doc(currentSemesterId)
             .collection('lectures')
-            .where('faculty', '==', currentFacultyId)
-            .orderBy('day')
-            .orderBy('startTime')
-            .get();
+            .where('facultyId', '==', currentFacultyId);
+        
+        if (selectedSec) {
+            query = query.where('section', '==', selectedSec);
+        }
+
+        const snapshot = await query.get();
+
+        const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const lectures = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+            .sort((a, b) => {
+                const dayDiff = dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day);
+                if (dayDiff !== 0) return dayDiff;
+                return (a.startTime || '').localeCompare(b.startTime || '');
+            });
 
         const listDiv = document.getElementById('lecturesList');
         listDiv.innerHTML = '';
@@ -121,6 +185,7 @@ async function showMyLectures() {
             table.innerHTML = `
                 <tr>
                     <th>Subject</th>
+                    <th>Sec</th>
                     <th>Day</th>
                     <th>Time</th>
                     <th>Room</th>
@@ -128,11 +193,11 @@ async function showMyLectures() {
                 </tr>
             `;
 
-            lectures.forEach(doc => {
-                const lecture = doc.data();
+            lectures.forEach(lecture => {
                 const row = table.insertRow();
                 row.innerHTML = `
                     <td>${lecture.subject}</td>
+                    <td style="text-align:center"><strong>${lecture.section || '--'}</strong></td>
                     <td>${lecture.day}</td>
                     <td>${lecture.startTime} - ${lecture.endTime}</td>
                     <td>${lecture.room}</td>
@@ -154,12 +219,11 @@ function closeLecturesModal() {
 }
 
 // ============================================================================
-// CANCEL LECTURE
+// FACULTY ACTIONS
 // ============================================================================
 
 async function handleCancelLecture(event) {
     event.preventDefault();
-
     const lectureId = document.getElementById('cancelLectureSelect').value;
     const reason = document.getElementById('cancelReason').value;
 
@@ -170,19 +234,13 @@ async function handleCancelLecture(event) {
 
     try {
         showStatus('cancelStatus', 'Cancelling lecture...', 'info');
-
-        const cancelLecture = functions.httpsCallable('cancelLecture');
-        const result = await cancelLecture({
-            semesterId: currentSemesterId,
-            lectureId,
-            reason,
-        });
+        const cancelLecture = window.functions.httpsCallable('cancelLecture');
+        const result = await cancelLecture({ semesterId: currentSemesterId, lectureId, reason });
 
         if (result.data.success) {
             showStatus('cancelStatus', '✓ Lecture cancelled. Students notified.', 'success');
             document.getElementById('cancelReason').value = '';
             await loadMyLecturesForSelect();
-            setTimeout(() => loadMyLecturesForSelect(), 1000);
         } else {
             showStatus('cancelStatus', `Error: ${result.data.message}`, 'error');
         }
@@ -191,13 +249,8 @@ async function handleCancelLecture(event) {
     }
 }
 
-// ============================================================================
-// RESCHEDULE LECTURE
-// ============================================================================
-
 async function handleRescheduleLecture(event) {
     event.preventDefault();
-
     const lectureId = document.getElementById('rescheduleLectureSelect').value;
     const newDay = document.getElementById('newDay').value;
     const newStartTime = document.getElementById('newStartTime').value;
@@ -208,29 +261,34 @@ async function handleRescheduleLecture(event) {
         return;
     }
 
-    // Validate times
-    if (newStartTime >= newEndTime) {
-        showStatus('rescheduleStatus', 'End time must be after start time', 'error');
-        return;
-    }
-
     try {
-        showStatus('rescheduleStatus', 'Rescheduling lecture...', 'info');
+        showStatus('rescheduleStatus', 'Checking availability...', 'info');
 
-        const rescheduleLecture = functions.httpsCallable('rescheduleLecture');
+        // 1. Get original lecture info
+        const docSnap = await window.db.collection('semesters').doc(currentSemesterId)
+            .collection('lectures').doc(lectureId).get();
+        if (!docSnap.exists) throw new Error('Lecture not found.');
+        const original = docSnap.data();
+
+        // 2. Local collision check (optional but faster for user)
+        const isBusy = await checkSlotAvailability(newDay, newStartTime, newEndTime, original.section, original.room, lectureId);
+        if (isBusy) {
+            showStatus('rescheduleStatus', `Slot occupied: ${isBusy}. Choose another time/day.`, 'error');
+            return;
+        }
+
+        showStatus('rescheduleStatus', 'Rescheduling lecture...', 'info');
+        const rescheduleLecture = window.functions.httpsCallable('rescheduleLecture');
         const result = await rescheduleLecture({
             semesterId: currentSemesterId,
             lectureId,
             newDay,
             newStartTime,
-            newEndTime,
+            newEndTime
         });
 
         if (result.data.success) {
             showStatus('rescheduleStatus', '✓ Lecture rescheduled. Students notified.', 'success');
-            document.getElementById('newDay').value = '';
-            document.getElementById('newStartTime').value = '';
-            document.getElementById('newEndTime').value = '';
             await loadMyLecturesForSelect();
         } else {
             showStatus('rescheduleStatus', `Error: ${result.data.message}`, 'error');
@@ -240,13 +298,8 @@ async function handleRescheduleLecture(event) {
     }
 }
 
-// ============================================================================
-// ANNOUNCEMENTS
-// ============================================================================
-
 async function handleFacultyAnnouncement(event) {
     event.preventDefault();
-
     const title = document.getElementById('facultyAnnouncementTitle').value;
     const message = document.getElementById('facultyAnnouncementMsg').value;
 
@@ -257,16 +310,11 @@ async function handleFacultyAnnouncement(event) {
 
     try {
         showStatus('facultyAnnouncementStatus', 'Sending announcement...', 'info');
-
-        const sendAnnouncement = functions.httpsCallable('sendAnnouncement');
-        const result = await sendAnnouncement({
-            semesterId: currentSemesterId,
-            title,
-            message,
-        });
+        const sendAnnouncement = window.functions.httpsCallable('sendAnnouncement');
+        const result = await sendAnnouncement({ semesterId: currentSemesterId, title, message });
 
         if (result.data.success) {
-            showStatus('facultyAnnouncementStatus', '✓ Announcement sent to all students.', 'success');
+            showStatus('facultyAnnouncementStatus', '✓ Announcement sent.', 'success');
             document.getElementById('facultyAnnouncementTitle').value = '';
             document.getElementById('facultyAnnouncementMsg').value = '';
         } else {
@@ -277,171 +325,13 @@ async function handleFacultyAnnouncement(event) {
     }
 }
 
-// ============================================================================
-// SUBJECT CHAT
-// ============================================================================
-
-async function loadSubjectsForChat() {
-    try {
-        const lectures = await db.collection('semesters').doc(currentSemesterId)
-            .collection('lectures')
-            .where('faculty', '==', currentFacultyId)
-            .get();
-
-        const select = document.getElementById('chatSubjectSelect');
-        if (!select) return;
-
-        const subjects = [...new Set(lectures.docs.map(doc => doc.data().subject))].sort();
-        
-        const currentVal = select.value;
-        select.innerHTML = '<option value="">-- Select Subject --</option>';
-        subjects.forEach(subject => {
-            const opt = document.createElement('option');
-            opt.value = subject;
-            opt.textContent = subject;
-            if (subject === currentVal) opt.selected = true;
-            select.appendChild(opt);
-        });
-
-        // If a subject is selected, start real-time listener for messages
-        if (currentVal) {
-            const messagesDiv = document.getElementById('subjectChatMessages');
-            db.collection('semesters').doc(currentSemesterId)
-                .collection('subjects').doc(currentVal)
-                .collection('chat')
-                .orderBy('timestamp', 'asc')
-                .limitToLast(50)
-                .onSnapshot(snapshot => {
-                    messagesDiv.innerHTML = '';
-                    if (snapshot.empty) {
-                        messagesDiv.innerHTML = '<p class="empty-message">No messages yet.</p>';
-                    } else {
-                        snapshot.forEach(doc => {
-                            const msg = doc.data();
-                            const item = document.createElement('div');
-                            item.className = `chat-message ${msg.senderRole === 'faculty' ? 'staff' : 'student'}`;
-                            const time = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString() : '--';
-                            
-                            item.innerHTML = `
-                                <div class="message-header">
-                                    <strong>${msg.senderName}</strong> <small>${time}</small>
-                                </div>
-                                <div class="message-body">${escapeHtml(msg.message)}</div>
-                            `;
-                            messagesDiv.appendChild(item);
-                        });
-                        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                    }
-                });
-        }
-    } catch (error) {
-        console.error('Error loading subjects for chat:', error);
-    }
-}
-
-async function handleSendSubjectMessage(event) {
-    event.preventDefault();
-
-    const subjectName = document.getElementById('chatSubjectSelect').value;
-    const message = document.getElementById('subjectChatMessage').value.trim();
-
-    if (!subjectName || !message) {
-        showStatus('subjectChatStatus', 'Please select a subject and enter a message', 'warning');
-        return;
-    }
-
-    try {
-        showStatus('subjectChatStatus', 'Sending message...', 'info');
-
-        const sendSubjectMessage = functions.httpsCallable('sendSubjectMessage');
-        const result = await sendSubjectMessage({
-            semesterId: currentSemesterId,
-            subjectName: subjectName,
-            message: message,
-        });
-
-        if (result.data.success) {
-            showStatus('subjectChatStatus', '✓ Message sent to subject group.', 'success');
-            document.getElementById('subjectChatMessage').value = '';
-        } else {
-            showStatus('subjectChatStatus', `Error: ${result.data.message}`, 'error');
-        }
-    } catch (error) {
-        showStatus('subjectChatStatus', `Failed: ${error.message}`, 'error');
-    }
-}
-
-async function loadMessageRequests() {
-    try {
-        showStatus('messageRequestsStatus', 'Loading requests...', 'info');
-
-        db.collection('semesters').doc(currentSemesterId)
-            .collection('faculty').doc(currentFacultyId)
-            .collection('message_requests')
-            .orderBy('timestamp', 'desc')
-            .onSnapshot(snapshot => {
-                const listDiv = document.getElementById('messageRequestsList');
-                listDiv.innerHTML = '';
-
-                if (snapshot.empty) {
-                    listDiv.innerHTML = '<p class="empty-message">No pending requests.</p>';
-                    showStatus('messageRequestsStatus', 'No requests', 'info');
-                    return;
-                }
-
-                snapshot.forEach(doc => {
-                    const req = doc.data();
-                    const item = document.createElement('div');
-                    item.className = 'notification-item';
-                    const time = req.timestamp ? new Date(req.timestamp.toDate()).toLocaleString() : '--';
-
-                    item.innerHTML = `
-                        <div class="notification-header">
-                            <strong>📩 From: ${req.senderName}</strong>
-                            <small>${time}</small>
-                        </div>
-                        <div class="notification-body">
-                            ${escapeHtml(req.message)}
-                        </div>
-                        <div class="notification-actions" style="margin-top: 10px;">
-                            <button class="primary-btn small" onclick="replyToStudent('${req.senderId}', '${req.senderName}')">Reply</button>
-                        </div>
-                    `;
-                    listDiv.appendChild(item);
-                });
-                showStatus('messageRequestsStatus', '✓ Updated', 'success');
-            });
-    } catch (error) {
-        showStatus('messageRequestsStatus', `Error: ${error.message}`, 'error');
-    }
-}
-
-function replyToStudent(studentId, studentName) {
-    // For now, we can just alert or open a prompt. 
-    // In a full implementation, this could open a direct chat.
-    const reply = prompt(`Reply to ${studentName}:`);
-    if (reply) {
-        alert("Personal replies feature coming soon! For now, use the Subject Chat to address group concerns.");
-    }
-}
-
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-// ============================================================================
-// LECTURE HISTORY
-// ============================================================================
-
 async function showLectureHistory() {
     if (!currentSemesterId) return;
 
     try {
-        const lectures = await db.collection('semesters').doc(currentSemesterId)
+        const lectures = await window.db.collection('semesters').doc(currentSemesterId)
             .collection('lectures')
-            .where('faculty', '==', currentFacultyId)
+            .where('facultyId', '==', currentFacultyId)
             .orderBy('lastModified', 'desc')
             .get();
 
@@ -453,15 +343,7 @@ async function showLectureHistory() {
         } else {
             const table = document.createElement('table');
             table.className = 'data-table';
-            table.innerHTML = `
-                <tr>
-                    <th>Subject</th>
-                    <th>Original Time</th>
-                    <th>Current Status</th>
-                    <th>Reason</th>
-                </tr>
-            `;
-
+            table.innerHTML = `<tr><th>Subject</th><th>Original Time</th><th>Status</th><th>Reason</th></tr>`;
             lectures.forEach(doc => {
                 const lecture = doc.data();
                 const row = table.insertRow();
@@ -472,10 +354,8 @@ async function showLectureHistory() {
                     <td>${lecture.cancelReason || lecture.originalTime || '--'}</td>
                 `;
             });
-
             listDiv.appendChild(table);
         }
-
         document.getElementById('historyModal').style.display = 'block';
     } catch (error) {
         showError(`Error loading history: ${error.message}`);
@@ -487,8 +367,75 @@ function closeHistoryModal() {
 }
 
 // ============================================================================
+// CHAT LOGIC
+// ============================================================================
+
+async function switchChat() {
+    const semId = document.getElementById('chatSemSelect').value;
+    const section = document.getElementById('chatSecSelect').value;
+    if (!semId) return;
+    if (typeof initChat === 'function') initChat(semId, section, 'chatMessages');
+}
+
+function openGroupChatView() {
+    const chatView = document.getElementById('groupChatView');
+    if (chatView) chatView.classList.remove('hidden');
+}
+
+function closeGroupChatView() {
+    const chatView = document.getElementById('groupChatView');
+    if (chatView) chatView.classList.add('hidden');
+}
+
+async function handleChatSubmit(e) {
+    if (e) e.preventDefault();
+    const semId = document.getElementById('chatSemSelect').value;
+    const section = document.getElementById('chatSecSelect').value;
+    const input = document.getElementById('chatInput');
+    const msg = input.value.trim();
+    if (!semId || !msg) return;
+
+    try {
+        const facultyName = document.getElementById('facultyName').textContent;
+        await sendMessage(semId, section, msg, window.auth.currentUser.uid, facultyName);
+        input.value = '';
+    } catch (err) {
+        showError('Failed to send: ' + err.message);
+    }
+}
+
+// ============================================================================
 // UTILITIES
 // ============================================================================
+
+async function updateTeachingSummary() {
+    const summaryDiv = document.getElementById('facultySummary');
+    if (!summaryDiv) return;
+    summaryDiv.innerHTML = '<small>Updating load...</small>';
+
+    try {
+        const lectures = await window.db.collection('semesters').doc(currentSemesterId)
+            .collection('lectures')
+            .where('facultyId', '==', currentFacultyId)
+            .get();
+
+        const subjects = {};
+        lectures.forEach(doc => {
+            const data = doc.data();
+            const key = `${data.subject} (${data.section})`;
+            subjects[key] = true;
+        });
+
+        const subjectList = Object.keys(subjects);
+        if (subjectList.length > 0) {
+            summaryDiv.innerHTML = `<div class="teaching-load"><strong>Teaching:</strong> ${subjectList.join(', ')}</div>`;
+        } else {
+            summaryDiv.innerHTML = '<div class="teaching-load">No classes this semester.</div>';
+        }
+    } catch (e) {
+        console.error('Summary error:', e);
+    }
+}
 
 function showStatus(elementId, message, type) {
     const element = document.getElementById(elementId);
@@ -504,9 +451,47 @@ function showError(message) {
 }
 
 function logout() {
-    auth.signOut().then(() => {
-        window.location.href = 'login.html';
-    }).catch(error => {
-        showError(error.message);
-    });
+    window.auth.signOut().then(() => {
+        window.location.href = '/pages/login.html';
+    }).catch(error => showError(error.message));
+}
+/**
+ * Check if a slot is available (no collisions for this section or this room).
+ */
+async function checkSlotAvailability(day, start, end, section, room, excludeId) {
+    try {
+        const snapshot = await window.db.collection('semesters').doc(currentSemesterId)
+            .collection('lectures')
+            .where('day', '==', day)
+            .where('status', '==', 'scheduled')
+            .get();
+
+        const collision = snapshot.docs.find(doc => {
+            if (doc.id === excludeId) return false;
+            const l = doc.data();
+            
+            // Check if section or room is same
+            const sameGroup = (l.section === section || l.room === room);
+            if (!sameGroup) return false;
+
+            // Check if times overlap
+            return timesOverlap(start, end, l.startTime, l.endTime);
+        });
+
+        if (collision) {
+            const l = collision.data();
+            return `${l.subject} (${l.startTime}-${l.endTime}) in ${l.room}`;
+        }
+    } catch (e) {
+        console.error('Availability check failed:', e);
+    }
+    return null;
+}
+
+function timesOverlap(s1, e1, s2, e2) {
+    const toMin = (t) => {
+        const [h, m] = t.split(':').map(Number);
+        return h * 60 + m;
+    };
+    return toMin(s1) < toMin(e2) && toMin(s2) < toMin(e1);
 }

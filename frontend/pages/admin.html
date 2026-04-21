@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lecture Scheduler - Admin Dashboard</title>
-    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="/css/admin.css">
 </head>
 
 <body>
@@ -113,6 +113,15 @@
                 <button class="primary-btn" onclick="showSettingsModal()">View Settings</button>
             </div>
 
+            <!-- 9. Master System Reset -->
+            <div class="action-card system-reset-card">
+                <h2>⚡ Master System Reset</h2>
+                <p>Wipe all existing lectures and restore the original institutional timetable for all semesters (II,
+                    IV, VI, VIII).</p>
+                <button class="primary-btn danger-btn" onclick="handleMasterReset()">🚀 Run Master Reset</button>
+                <div id="resetStatus" class="status-message"></div>
+            </div>
+
         </main>
     </div>
 
@@ -131,14 +140,38 @@
     <div id="facultyModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeFacultyModal()">&times;</span>
-            <h2>Manage Faculty</h2>
-            <form onsubmit="handleAddFaculty(event)" class="faculty-form">
-                <input type="text" id="facultyName" placeholder="Faculty Name" required>
-                <input type="text" id="facultyPhone" placeholder="Phone Number" required>
-                <input type="email" id="facultyEmail" placeholder="Email" required>
-                <button type="submit" class="primary-btn">Add Faculty</button>
-            </form>
-            <div id="facultyList" class="list-container"></div>
+            <h2>👨‍🏫 Manage Faculty</h2>
+            <div class="faculty-section">
+                <h3>Add New Faculty</h3>
+                <form onsubmit="handleAddFaculty(event)" class="faculty-form">
+                    <input type="text" id="facultyName" placeholder="Faculty Name" required>
+                    <input type="text" id="facultyPhone" placeholder="Phone Number" required>
+                    <input type="email" id="facultyEmail" placeholder="Email" required>
+                    <button type="submit" class="primary-btn">➕ Add Faculty</button>
+                </form>
+                <div id="addFacultyStatus" class="status-message"></div>
+            </div>
+
+            <div class="faculty-section">
+                <h3>Current Faculty</h3>
+                <div id="facultyList" class="list-container"></div>
+            </div>
+
+            <!-- Edit Faculty Modal (nested) -->
+            <div id="editFacultySection"
+                style="display:none; margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 6px;">
+                <h3>Edit Faculty</h3>
+                <form onsubmit="handleEditFaculty(event)" class="faculty-form">
+                    <input type="hidden" id="editFacultyId">
+                    <input type="text" id="editFacultyName" placeholder="Faculty Name" required>
+                    <input type="text" id="editFacultyPhone" placeholder="Phone Number" required>
+                    <input type="email" id="editFacultyEmail" placeholder="Email" required>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit" class="primary-btn">💾 Save Changes</button>
+                        <button type="button" onclick="cancelEditFaculty()" class="secondary-btn">Cancel</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -205,10 +238,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-storage-compat.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-functions-compat.js" defer></script>
-    <script src="../js/firebase-config.js" defer></script>
-    <script src="../js/common.js" defer></script>
-    <script src="../js/seedDataAdmin.js" defer></script>
-    <script src="../js/admin.js" defer></script>
+    <script src="/js/firebase-config.js" defer></script>
+    <script src="/js/common.js" defer></script>
+    <script src="/js/admin.js?v=20260417_1" defer></script>
 </body>
 
 </html>
