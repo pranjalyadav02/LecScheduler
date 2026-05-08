@@ -42,3 +42,10 @@ credentials.json
 service-account-key.json
 .vercel
 .env*.local
+
+# Project Reports & Outputs
+EXTENDED_PROJECT_REPORT.txt
+PROJECT_REPORT_DETAILS.txt
+PROJECT_REPORT_FULL_THEORY.txt
+pdf_extracted.txt
+pdf_utf8.txt
