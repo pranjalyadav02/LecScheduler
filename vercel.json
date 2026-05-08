@@ -26,8 +26,8 @@
             "destination": "/frontend/pages/student.html"
         },
         {
-            "source": "/(.*)\\.html",
-            "destination": "/frontend/pages/$1.html"
+            "source": "/pages/(.*)",
+            "destination": "/frontend/pages/$1"
         },
         {
             "source": "/(.*)",
