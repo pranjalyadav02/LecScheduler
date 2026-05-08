@@ -1,0 +1,139 @@
+================================================================================
+PROJECT REPORT: COMPREHENSIVE THEORETICAL DOCUMENTATION
+LECSCHEDULER - AUTOMATED ACADEMIC SCHEDULING SYSTEM
+================================================================================
+
+1. INTRODUCTION AND MOTIVATION
+--------------------------------------------------------------------------------
+Theoretical Background: In traditional academic institutions, scheduling lectures, 
+managing substitutions, and disseminating timetable changes are highly manual 
+processes. These processes are prone to human error, scheduling conflicts 
+(e.g., double-booking a professor or a room), and communication latency. The 
+LecScheduler project addresses these challenges by applying modern web technologies, 
+serverless architecture, and artificial intelligence to automate and streamline 
+academic scheduling. It transitions the institution from static, paper-based 
+notices to a dynamic, real-time digital ecosystem.
+
+2. SYSTEM ARCHITECTURE PARADIGMS
+--------------------------------------------------------------------------------
+The application is built upon a modern Cloud-Native framework employing several 
+key architectural paradigms:
+
+* Serverless Computing: 
+Instead of provisioning and maintaining a traditional always-on server, the backend 
+logic is executed on-demand via Firebase Cloud Functions. This architecture abstracts 
+server management, reduces infrastructure costs, and scales automatically based on 
+network traffic.
+
+* Event-Driven Architecture: 
+The system relies on asynchronous event listeners. Components react to state 
+changes rather than constantly polling for them. For example, a PDF upload to 
+cloud storage triggers a parsing function; a lecture cancellation in the database 
+triggers a real-time DOM update on the client's screen.
+
+* Single-Page Application (SPA): 
+The frontend dynamically rewrites the current web page with new data from the 
+web server, rather than the default method of the browser loading entire new pages. 
+This results in a faster, more fluid user experience that mimics a native desktop 
+application.
+
+3. TECHNOLOGY STACK: DETAILED THEORY
+--------------------------------------------------------------------------------
+3.1 Frontend Technologies (Client-Side)
+* HTML5 & Semantic Web: Provides the structural foundation of the application, 
+ensuring accessibility and correct document outlining for browsers and screen readers.
+* CSS3 (Vanilla): Utilized for responsive, mobile-first design. By avoiding heavy 
+CSS frameworks (like Bootstrap or Tailwind), the application minimizes network 
+payload size, adhering to a "Low-Infrastructure Design" philosophy optimized for 
+devices with limited processing power or bandwidth.
+* JavaScript (ES6+): Handles asynchronous operations (Promises, async/await), 
+DOM manipulation, and state management on the client side without the overhead 
+of heavy JavaScript frameworks, ensuring raw execution speed.
+* Service Workers (Progressive Web App Concepts): Acts as a programmable network 
+proxy between the browser and the internet. It intercepts network requests and 
+serves cached data, allowing students to view their timetables even when completely 
+offline or on unstable mobile networks.
+
+3.2 Backend & Infrastructure (Firebase Ecosystem)
+* Firebase Cloud Firestore (NoSQL Database): 
+Unlike traditional relational databases (SQL) that use rigid tables and rows, 
+Firestore is a document-oriented NoSQL database. Data is stored in JSON-like 
+documents organized into collections. This schema-less design allows for highly 
+flexible hierarchical data models (e.g., nesting 'lectures' and 'students' inside 
+'semesters'). Furthermore, Firestore utilizes WebSockets to provide real-time 
+synchronization, instantly pushing database updates directly to connected clients.
+* Firebase Cloud Functions: 
+Provides a Backend-as-a-Service (BaaS) environment. Backend algorithms are deployed 
+to Google's cloud and run in isolated Node.js environments. They securely handle 
+privileged operations that cannot be trusted to the client, such as generating 
+authentication tokens, sending bulk announcements, and processing file uploads.
+* Firebase Authentication: 
+Implements secure, token-based authentication using JSON Web Tokens (JWT). It 
+securely manages session persistence, cryptographic password hashing, and user 
+identity verification.
+
+4. ARTIFICIAL INTELLIGENCE & AUTOMATION
+--------------------------------------------------------------------------------
+* Google Gemini API (Large Language Models): 
+Traditional parsing algorithms (Regex, positional mapping) frequently fail with 
+timetable PDFs because visual layouts (grids, merged cells) do not translate 
+predictably to raw text streams. LecScheduler solves this by utilizing the Gemini 
+API, an advanced Generative AI model. The LLM acts as a semantic interpretation 
+engine; it analyzes the unstructured extracted text, identifies contextual patterns 
+(recognizing what text constitutes a subject, a faculty name, or a time slot), 
+and structures the output into a deterministic, machine-readable JSON format. 
+This represents a paradigm shift from "brute-force rule-based parsing" to 
+"context-aware intelligent extraction."
+* pdf-parse: A low-level Node.js utility that strips binary PDF data into a raw 
+string format, serving as the initial input pipeline for the AI model.
+
+5. CORE SYSTEM MODULES AND ALGORITHMS
+--------------------------------------------------------------------------------
+5.1 Role-Based Access Control (RBAC) & Security
+Theory: RBAC restricts system access to authorized users based on predefined roles, 
+enforcing the Principle of Least Privilege.
+* Admin: Unrestricted access to master controls, user provisioning, and semester 
+lifecycle management.
+* Faculty: Write access limited strictly to specific lecture documents assigned to 
+their unique Faculty ID (allowing cancellations/rescheduling), and read access to 
+their assigned students.
+* Student: Strictly read-only access to their specific semester's timetable and 
+system announcements, preventing unauthorized data mutation.
+Implementation: This is enforced securely at the database level using Firestore 
+Security Rules. These rules evaluate the cryptographic signature and payload of the 
+user's JWT token before permitting any read or write operation at the server level.
+
+5.2 Real-Time Conflict Detection Algorithm
+Theory: To maintain academic scheduling integrity, the system must prevent resource 
+starvation and double-booking (e.g., a professor assigned to two classes simultaneously).
+Implementation: When a faculty member attempts to reschedule a lecture, the algorithm 
+queries the database for existing active lectures within the target time boundary. 
+It evaluates mathematical interval intersections:
+`if (NewStartTime < ExistingEndTime AND NewEndTime > ExistingStartTime)` 
+for specific resources (Faculty ID or Room ID). If a temporal overlap is detected, 
+the transaction is rejected, ensuring mathematical correctness of the timetable.
+
+5.3 Master Data Expansion (Seeding)
+Theory: Processing massive amounts of institutional data requires atomic operations 
+to prevent database corruption during partial failures.
+Implementation: The system utilizes Firestore Batched Writes. When a Master Reset 
+is triggered, the system processes compressed timetable representations (e.g., 
+"Mon-Tue 10:00") and expands them algorithmically into individual, day-specific 
+lecture documents across an entire 6-day week. These hundreds of documents are 
+committed to the database in a single atomic transaction—meaning either all records 
+are saved successfully, or none are, preventing orphaned data.
+
+6. QUALITY ASSURANCE AND SOFTWARE ENGINEERING PRACTICES
+--------------------------------------------------------------------------------
+* Headless Browser Automation (Puppeteer-core): 
+To ensure extreme system reliability, End-to-End (E2E) testing is implemented. 
+Puppeteer-core programmatically controls a headless Google Chrome browser instance 
+via the DevTools Protocol. It simulates exact human interactions (typing credentials, 
+clicking buttons, waiting for asynchronous DOM updates). This rigorous methodology 
+validates the complete integration lifecycle between the frontend UI elements, the 
+asynchronous Firebase backend calls, and the real-time database WebSockets.
+
+================================================================================
+END OF REPORT
+Generated on: 2026-05-07
+================================================================================

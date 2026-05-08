@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lecture Scheduler - Student Portal</title>
     <link rel="stylesheet" href="/css/student.css">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="shortcut icon" href="/favicon.ico">
 </head>
 
 <body>
@@ -14,6 +16,7 @@
         <header class="student-header">
             <h1>📚 My Timetable</h1>
             <div class="header-right">
+                <div id="liveClock" class="live-clock"></div>
                 <span id="studentName">Student</span>
                 <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
@@ -27,7 +30,7 @@
         <!-- Main Tabs -->
         <nav class="tab-navigation">
             <button class="tab-btn active" onclick="switchTab('timetable', event)">📅 Timetable</button>
-            <button class="tab-btn" onclick="switchTab('notifications', event)">🔔 Notifications</button>
+            <button class="tab-btn" onclick="switchTab('notifications', event)">🔔 Notifications <span id="notifBadge" class="badge-count" style="display:none">0</span></button>
             <button class="tab-btn" onclick="switchTab('chat', event)">💬 Semester Chat</button>
         </nav>
 

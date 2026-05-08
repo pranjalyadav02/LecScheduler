@@ -1,0 +1,512 @@
+
+
+MINOR PROJECT REPORT
+LECSCHEDULER – AUTOMATED ACADEMIC SCHEDULING SYSTEM
+Submitted in Partial Fulfillment of the Requirement for the Degree of Bachelor of
+Computer Applications (BCA)
+CERTIFICATE
+This is to certify that the project entitled “LecScheduler – Automated Academic Scheduling System”
+submitted by ________ is a bonafide work carried out under the guidance and supervision of the undersigned
+in partial fulfillment for the award of the degree of Bachelor of Computer Applications (BCA).
+The work presented in this project report is original and has not been submitted elsewhere for the award of
+any other degree or diploma.
+Project Guide Signature: ________
+Head of Department: ________
+College Seal
+DECLARATION
+I hereby declare that the project report entitled “LecScheduler – Automated Academic Scheduling
+System” submitted by me is an original work carried out under the guidance of my faculty mentor. The
+information and data presented in this report are true to the best of my knowledge.
+Student Signature: ________
+Name: ________
+Roll Number: ________
+ACKNOWLEDGEMENT
+I express my sincere gratitude to my project guide, faculty members, and department for their continuous
+support and valuable suggestions throughout the development of this project.
+1
+
+I would also like to thank my friends and family for motivating me during the completion of this project.
+Finally, I thank everyone who directly or indirectly contributed to the successful completion of this work.
+ABSTRACT
+LecScheduler is an intelligent academic scheduling and timetable automation platform designed to simplify
+lecture management in educational institutions. Traditional scheduling methods are highly manual, time-
+consuming, and error-prone. Problems such as lecture clashes, classroom conflicts, delayed
+announcements, and inefficient timetable updates create operational difficulties for institutions.
+The proposed system introduces a modern cloud-based and AI-powered solution that automates lecture
+scheduling, substitution handling, timetable updates, and conflict detection in real time. The application is
+developed using modern web technologies including HTML5, CSS3, JavaScript, Firebase Firestore, Firebase
+Authentication, and Firebase Cloud Functions.
+The system uses an event-driven serverless architecture and supports real-time synchronization between
+students, faculty, and administrators. It also integrates Artificial Intelligence using the Google Gemini API to
+intelligently parse timetable PDFs and convert unstructured timetable data into machine-readable JSON.
+The system improves scheduling accuracy, minimizes administrative workload, ensures secure access
+control, and provides students with instant timetable updates. The application also supports offline access
+using service workers, making it highly reliable even in unstable internet conditions.
+Keywords: Cloud Computing, Firebase, Artificial Intelligence, Scheduling System, Timetable Automation,
+Real-Time Database, Serverless Computing.
+TABLE OF CONTENTS
+Introduction
+Problem Statement
+Objectives of the Project
+Existing System
+Proposed System
+System Architecture
+Technology Stack
+Artificial Intelligence Integration
+System Modules
+Algorithms Used
+Database Design
+Security and Authentication
+Software Testing
+Advantages of the System
+Limitations
+1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+8. 
+9. 
+10. 
+11. 
+12. 
+13. 
+14. 
+15. 
+2
+
+Future Enhancements
+Conclusion
+References
+CHAPTER 1 – INTRODUCTION
+1.1 Introduction
+Educational institutions handle large numbers of lectures, classrooms, faculty schedules, and student
+timetables every day. Managing these operations manually often results in scheduling conflicts, inefficient
+communication, and excessive administrative effort.
+LecScheduler is designed as a smart automated academic scheduling platform that digitizes and simplifies
+timetable management. The system enables educational institutions to manage lectures efficiently using
+cloud technologies and real-time synchronization.
+The application automates timetable generation, faculty substitutions, conflict detection, and schedule
+updates while ensuring that all users receive instant information through a centralized digital platform.
+1.2 Motivation
+The motivation behind this project comes from the limitations of traditional academic scheduling systems.
+Most institutions still rely on manual processes, spreadsheets, or static notices for managing schedules.
+Common issues include:
+Double booking of classrooms
+Faculty scheduling conflicts
+Delayed timetable updates
+Communication gaps
+Difficulty in handling substitutions
+High administrative workload
+The project aims to solve these challenges by using cloud-native technologies and intelligent automation.
+CHAPTER 2 – PROBLEM STATEMENT
+Traditional academic scheduling systems are inefficient, difficult to maintain, and highly dependent on
+manual coordination. Institutions face problems such as:
+Human errors during timetable creation
+16. 
+17. 
+18. 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+3
+
+Lack of real-time schedule updates
+Difficulty in managing substitutions
+Slow communication with students
+Resource conflicts between faculty and classrooms
+Limited scalability of manual systems
+Therefore, there is a need for an intelligent automated scheduling platform that can handle academic
+operations efficiently.
+CHAPTER 3 – OBJECTIVES OF THE PROJECT
+The main objectives of LecScheduler are:
+To automate lecture scheduling processes.
+To reduce scheduling conflicts and manual errors.
+To provide real-time timetable synchronization.
+To implement secure role-based access control.
+To support offline access for students.
+To integrate AI for intelligent timetable processing.
+To improve communication between faculty and students.
+To create a scalable and cloud-based scheduling platform.
+CHAPTER 4 – EXISTING SYSTEM
+In the existing system, timetable management is mostly handled manually using spreadsheets, printed
+notices, or static PDFs.
+Drawbacks of Existing System
+Time-consuming manual work
+Increased chances of scheduling errors
+Lack of real-time updates
+No intelligent conflict detection
+Poor communication efficiency
+Difficult maintenance
+No centralized database
+CHAPTER 5 – PROPOSED SYSTEM
+The proposed LecScheduler system introduces a cloud-based intelligent scheduling platform.
+• 
+• 
+• 
+• 
+• 
+1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+8. 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+4
+
+Features of Proposed System
+Automated timetable generation
+Real-time lecture updates
+AI-powered PDF parsing
+Faculty substitution management
+Conflict detection algorithms
+Cloud database synchronization
+Offline support using service workers
+Secure authentication system
+The system improves efficiency, scalability, and reliability.
+CHAPTER 6 – SYSTEM ARCHITECTURE
+6.1 Architectural Paradigm
+The system follows a modern cloud-native architecture.
+Serverless Computing
+Backend logic is executed using Firebase Cloud Functions without managing physical servers.
+Event-Driven Architecture
+The application reacts to events such as database changes and file uploads.
+Single Page Application (SPA)
+The frontend dynamically updates content without reloading the entire webpage.
+6.2 Architecture Flow
+User logs into the system.
+Authentication is verified using Firebase Authentication.
+Timetable data is fetched from Firestore.
+Real-time updates are synchronized instantly.
+AI processes uploaded timetable PDFs.
+Conflict detection validates scheduling operations.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+5
+
+CHAPTER 7 – TECHNOLOGY STACK
+7.1 Frontend Technologies
+HTML5
+Provides semantic structure for the application.
+CSS3
+Used for responsive and mobile-friendly user interface design.
+JavaScript (ES6+)
+Handles asynchronous operations, API communication, and DOM manipulation.
+Service Workers
+Enable offline access and caching support.
+7.2 Backend Technologies
+Firebase Firestore
+A NoSQL cloud database providing real-time synchronization.
+Firebase Cloud Functions
+Used for backend logic and secure server-side processing.
+Firebase Authentication
+Provides secure login and token-based authentication.
+Node.js
+Backend runtime environment for cloud functions.
+6
+
+CHAPTER 8 – ARTIFICIAL INTELLIGENCE
+INTEGRATION
+Google Gemini API
+Traditional timetable PDFs are difficult to parse because they contain complex layouts, tables, and merged
+cells.
+The system uses the Google Gemini API to intelligently analyze timetable data and convert unstructured
+information into structured JSON.
+Benefits of AI Integration
+Intelligent timetable extraction
+Reduced manual data entry
+Better accuracy
+Faster processing
+Context-aware data understanding
+CHAPTER 9 – SYSTEM MODULES
+9.1 Admin Module
+Manage users
+Manage semesters
+Generate timetables
+Reset master data
+Monitor system activities
+9.2 Faculty Module
+View lecture schedules
+Cancel lectures
+Reschedule classes
+Upload announcements
+9.3 Student Module
+View timetable
+Receive updates
+Access announcements
+Offline timetable viewing
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+7
+
+CHAPTER 10 – ALGORITHMS USED
+10.1 Conflict Detection Algorithm
+The system prevents overlapping lectures using time interval validation.
+Condition:
+If (NewStartTime < ExistingEndTime AND NewEndTime > ExistingStartTime)
+Then a conflict exists.
+Advantages
+Prevents double booking
+Ensures schedule accuracy
+Maintains resource integrity
+10.2 Batched Write Algorithm
+The system uses Firestore Batched Writes to perform atomic database operations.
+Benefits:
+Data consistency
+Improved reliability
+Prevents partial database corruption
+CHAPTER 11 – DATABASE DESIGN
+The application uses Firebase Firestore.
+Collections Used
+Users
+Students
+Faculty
+Semesters
+Lectures
+Timetables
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+8
+
+Announcements
+Advantages of NoSQL Database
+Flexible schema
+Real-time synchronization
+High scalability
+Fast cloud-based operations
+CHAPTER 12 – SECURITY AND AUTHENTICATION
+Role-Based Access Control (RBAC)
+The system uses RBAC to restrict access based on user roles.
+Admin
+Full access to all modules.
+Faculty
+Limited access to assigned lecture operations.
+Student
+Read-only access to timetable and announcements.
+Firebase Security Rules
+Security rules validate user authentication before database operations are allowed.
+Benefits:
+Secure data access
+Protection against unauthorized operations
+Token-based validation
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+9
+
+CHAPTER 13 – SOFTWARE TESTING
+End-to-End Testing
+The project uses Puppeteer-core for browser automation testing.
+Testing includes:
+Login verification
+UI interaction testing
+Database synchronization testing
+Real-time update testing
+Form validation testing
+Types of Testing Performed
+Unit Testing
+Integration Testing
+Functional Testing
+Performance Testing
+Security Testing
+CHAPTER 14 – ADVANTAGES OF THE SYSTEM
+Automated scheduling
+Real-time updates
+Secure authentication
+AI-powered automation
+Reduced manual workload
+Improved communication
+Offline support
+Cloud scalability
+Faster timetable processing
+Better user experience
+CHAPTER 15 – LIMITATIONS
+Requires internet for synchronization
+Dependency on cloud services
+AI parsing may require optimization for highly complex PDFs
+• 
+• 
+• 
+• 
+• 
+1. 
+2. 
+3. 
+4. 
+5. 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+10
+
+Initial setup complexity
+CHAPTER 16 – FUTURE ENHANCEMENTS
+Future improvements may include:
+Mobile application support
+Attendance management system
+AI-based timetable optimization
+Smart analytics dashboard
+SMS and email notification system
+Multi-college support
+Voice assistant integration
+Predictive scheduling using Machine Learning
+CHAPTER 17 – CONCLUSION
+LecScheduler successfully demonstrates how modern cloud technologies and Artificial Intelligence can
+transform academic scheduling systems.
+The project automates lecture management, improves communication, minimizes conflicts, and provides
+real-time synchronization between administrators, faculty, and students.
+By integrating Firebase cloud services, AI-powered timetable parsing, and secure authentication
+mechanisms, the system delivers a scalable, efficient, and future-ready academic scheduling platform.
+The project reflects the practical implementation of software engineering principles, cloud computing
+concepts, database management, security mechanisms, and intelligent automation technologies.
+REFERENCES
+Firebase Official Documentation
+Google Gemini API Documentation
+Node.js Documentation
+JavaScript ES6 Documentation
+Cloud Computing Concepts
+NoSQL Database Fundamentals
+Software Engineering Principles
+Web Development Technologies
+Firestore Security Rules Documentation
+Progressive Web App (PWA) Concepts
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+8. 
+9. 
+10. 
+11
+
+APPENDIX
+Tools Used
+Visual Studio Code
+Firebase Console
+Google Chrome
+Node.js Runtime
+GitHub
+Hardware Requirements
+Intel i3 Processor or Higher
+4 GB RAM Minimum
+Stable Internet Connection
+Modern Web Browser
+Software Requirements
+Windows/Linux/macOS
+Node.js
+Firebase SDK
+Chrome Browser
+Code Editor
+FINAL RESULT
+The LecScheduler project successfully automates academic scheduling operations while maintaining high
+reliability, scalability, and security.
+The system demonstrates practical implementation of:
+Cloud Computing
+Artificial Intelligence
+Real-Time Databases
+Web Development
+Security Mechanisms
+Software Engineering Principles
+This project provides an innovative solution for modern educational institutions and can significantly
+improve timetable management efficiency.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+12

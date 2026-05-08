@@ -353,17 +353,19 @@ async function handlePDFUpload(event) {
 
 async function checkUploadStatus() {
     try {
-        const uploads = await window.db.collection('pdf_uploads')
+        const snapshot = await window.db.collection('pdf_uploads')
             .where('semesterId', '==', currentSemesterId)
-            .orderBy('uploadedAt', 'desc')
-            .limit(1)
             .get();
 
-        if (uploads.empty) {
+        if (snapshot.empty) {
             return;
         }
 
-        const latestUpload = uploads.docs[0].data();
+        // Sort client-side by uploadedAt descending
+        const uploads = snapshot.docs.map(doc => doc.data())
+            .sort((a, b) => (b.uploadedAt?.toDate() || 0) - (a.uploadedAt?.toDate() || 0));
+
+        const latestUpload = uploads[0];
 
         if (latestUpload.status === 'processing') {
             setTimeout(() => checkUploadStatus(), 3000);
@@ -401,14 +403,22 @@ async function loadTimetableSummary() {
             rescheduled: 0,
         };
 
+        const sectionCounts = {};
         lectures.forEach(doc => {
-            const status = doc.data().status;
+            const data = doc.data();
+            const status = data.status;
             if (status === 'scheduled') counts.scheduled++;
             else if (status === 'cancelled') counts.cancelled++;
             else if (status === 'rescheduled') counts.rescheduled++;
+
+            const sec = data.section || 'N/A';
+            sectionCounts[sec] = (sectionCounts[sec] || 0) + 1;
         });
 
-        const msg = `Total: ${counts.total} | Scheduled: ${counts.scheduled} | Cancelled: ${counts.cancelled} | Rescheduled: ${counts.rescheduled}`;
+        let msg = `Total: ${counts.total} | Scheduled: ${counts.scheduled} | Cancelled: ${counts.cancelled} | Rescheduled: ${counts.rescheduled}`;
+        const secDetails = Object.entries(sectionCounts).map(([sec, count]) => `Sec ${sec}: ${count}`).join(' | ');
+        if (secDetails) msg += `\n\n📌 Section-wise: ${secDetails}`;
+        
         showStatus('lectureStatus', msg, 'info');
     } catch (error) {
         showStatus('lectureStatus', `Error loading timetable: ${error.message}`, 'error');
@@ -422,51 +432,98 @@ async function showTimetableModal() {
     }
 
     try {
-        const lectures = await window.db.collection('semesters').doc(currentSemesterId)
+        const semesterName = document.getElementById('semesterSelect').options[document.getElementById('semesterSelect').selectedIndex].text;
+        
+        const snapshot = await window.db.collection('semesters').doc(currentSemesterId)
             .collection('lectures')
-            .orderBy('day')
-            .orderBy('startTime')
             .get();
 
-        const listDiv = document.getElementById('timetableList');
-        listDiv.innerHTML = '';
-
-        if (lectures.empty) {
-            listDiv.innerHTML = '<p>No lectures found. Upload a timetable PDF.</p>';
-        } else {
-            const table = document.createElement('table');
-            table.className = 'data-table';
-            table.innerHTML = `
-                <tr>
-                    <th>Subject</th>
-                    <th>Faculty</th>
-                    <th>Day</th>
-                    <th>Time</th>
-                    <th>Room</th>
-                    <th>Status</th>
-                </tr>
-            `;
-
-            lectures.forEach(doc => {
-                const lecture = doc.data();
-                const row = table.insertRow();
-                row.innerHTML = `
-                    <td>${lecture.subject}</td>
-                    <td>${lecture.faculty}</td>
-                    <td>${lecture.day}</td>
-                    <td>${lecture.startTime} - ${lecture.endTime}</td>
-                    <td>${lecture.room}</td>
-                    <td><span class="status-badge ${lecture.status}">${lecture.status}</span></td>
-                `;
+        const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        window.allLectures = snapshot.docs.map(doc => doc.data())
+            .sort((a, b) => {
+                const dayOrderA = dayOrder.indexOf(a.day);
+                const dayOrderB = dayOrder.indexOf(b.day);
+                if (dayOrderA !== dayOrderB) return dayOrderA - dayOrderB;
+                return (a.startTime || '').localeCompare(b.startTime || '');
             });
 
-            listDiv.appendChild(table);
-        }
+        // Update modal title
+        document.querySelector('#timetableModal h2').textContent = `Timetable: ${semesterName}`;
+
+        // Populate section filter
+        const sections = [...new Set(window.allLectures.map(l => l.section))].filter(Boolean).sort();
+        const filter = document.getElementById('modalSecFilter');
+        filter.innerHTML = '<option value="">All Sections</option>';
+        sections.forEach(sec => {
+            const opt = document.createElement('option');
+            opt.value = sec;
+            opt.textContent = `Section ${sec}`;
+            filter.appendChild(opt);
+        });
+
+        renderTimetable(window.allLectures);
 
         document.getElementById('timetableModal').style.display = 'block';
     } catch (error) {
         showError(`Error loading timetable: ${error.message}`);
     }
+}
+
+function filterTimetableBySection() {
+    const sec = document.getElementById('modalSecFilter').value;
+    const filtered = sec 
+        ? window.allLectures.filter(l => l.section === sec)
+        : window.allLectures;
+    renderTimetable(filtered);
+}
+
+function renderTimetable(lectures) {
+    const listDiv = document.getElementById('timetableList');
+    listDiv.innerHTML = '';
+
+    if (lectures.length === 0) {
+        listDiv.innerHTML = '<p>No lectures found.</p>';
+        return;
+    }
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'data-table-wrapper';
+    
+    const table = document.createElement('table');
+    table.className = 'data-table';
+    table.innerHTML = `
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Subject</th>
+                <th>Faculty</th>
+                <th>Day</th>
+                <th>Time</th>
+                <th>Room</th>
+                <th>Section</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    `;
+
+    const tbody = table.querySelector('tbody');
+    lectures.forEach(lecture => {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+            <td>${lecture.code || '-'}</td>
+            <td>${lecture.subject}</td>
+            <td>${lecture.faculty}</td>
+            <td>${lecture.day}</td>
+            <td>${lecture.startTime} - ${lecture.endTime}</td>
+            <td>${lecture.room}</td>
+            <td>${lecture.section || '-'}</td>
+            <td><span class="status-badge ${lecture.status}">${lecture.status}</span></td>
+        `;
+    });
+
+    wrapper.appendChild(table);
+    listDiv.appendChild(wrapper);
 }
 
 function closeTimetableModal() {
@@ -615,18 +672,20 @@ async function seedInstitutionalTimetableFromCsv() {
 
 async function loadFacultyList() {
     try {
-        const faculty = await window.db.collection('semesters').doc(currentSemesterId)
+        const snapshot = await window.db.collection('semesters').doc(currentSemesterId)
             .collection('faculty')
             .where('status', '==', 'active')
-            .orderBy('name')
             .get();
+
+        const faculty = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+            .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 
         const listDiv = document.getElementById('facultyList');
         if (!listDiv) return;
 
         listDiv.innerHTML = '';
 
-        if (faculty.empty) {
+        if (faculty.length === 0) {
             listDiv.innerHTML = '<p style="color: #666; padding: 15px;">No faculty added yet. Use the form above to add faculty members.</p>';
         } else {
             const table = document.createElement('table');
@@ -640,16 +699,15 @@ async function loadFacultyList() {
                 </tr>
             `;
 
-            faculty.forEach(doc => {
-                const f = doc.data();
+            faculty.forEach(f => {
                 const row = table.insertRow();
                 row.innerHTML = `
                     <td>${f.name || '—'}</td>
                     <td>${f.phone || '—'}</td>
                     <td>${f.email || '—'}</td>
                     <td style="display: flex; gap: 8px;">
-                        <button onclick="editFaculty('${doc.id}')" class="primary-btn" style="padding: 6px 12px; font-size: 12px;">✏️ Edit</button>
-                        <button onclick="removeFaculty('${doc.id}')" class="danger-btn" style="padding: 6px 12px; font-size: 12px;">Delete</button>
+                        <button onclick="editFaculty('${f.id}')" class="primary-btn" style="padding: 6px 12px; font-size: 12px;">✏️ Edit</button>
+                        <button onclick="removeFaculty('${f.id}')" class="danger-btn" style="padding: 6px 12px; font-size: 12px;">Delete</button>
                     </td>
                 `;
             });
@@ -883,20 +941,20 @@ async function handleAnnouncement(event) {
 
         showStatus('announcementStatus', 'Sending announcement...', 'info');
 
-        // Call Cloud Function
-        const sendAnnouncement = window.firebase.functions().httpsCallable('sendAnnouncement');
-        const result = await sendAnnouncement({
-            semesterId: currentSemesterId,
-            title,
-            message,
-        });
+        // Direct Firestore Write (Bypassing Cloud Functions for Free Tier)
+        const announcementData = {
+            type: 'announcement',
+            title: title || 'New Announcement',
+            message: message,
+            fromName: 'Administrator',
+            sentAt: window.firebase.firestore.FieldValue.serverTimestamp(),
+        };
 
-        if (result.data.success) {
-            document.querySelector('.announcement-form').reset();
-            showStatus('announcementStatus', '✓ Announcement sent to all students.', 'success');
-        } else {
-            showStatus('announcementStatus', `Error: ${result.data.message}`, 'error');
-        }
+        await window.db.collection('semesters').doc(currentSemesterId)
+            .collection('notifications').add(announcementData);
+
+        document.querySelector('.announcement-form').reset();
+        showStatus('announcementStatus', '✓ Announcement sent to all students.', 'success');
     } catch (error) {
         showStatus('announcementStatus', `Failed to send: ${error.message}`, 'error');
     }
@@ -965,16 +1023,18 @@ async function showMessageLog() {
     }
 
     try {
-        const messages = await window.db.collection('message_logs')
+        const snapshot = await window.db.collection('message_logs')
             .where('semesterId', '==', currentSemesterId)
-            .orderBy('timestamp', 'desc')
-            .limit(200)
             .get();
+
+        const messages = snapshot.docs.map(doc => doc.data())
+            .sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0))
+            .slice(0, 200);
 
         const listDiv = document.getElementById('messageLogList');
         listDiv.innerHTML = '';
 
-        if (messages.empty) {
+        if (messages.length === 0) {
             listDiv.innerHTML = '<p>No messages logged yet.</p>';
         } else {
             const table = document.createElement('table');
@@ -990,8 +1050,7 @@ async function showMessageLog() {
                 </tr>
             `;
 
-            messages.forEach(doc => {
-                const m = doc.data();
+            messages.forEach(m => {
                 const row = table.insertRow();
                 const ts = m.timestamp ? new Date(m.timestamp.toDate()).toLocaleString() : '—';
                 row.innerHTML = `
@@ -1101,6 +1160,7 @@ async function showSettingsModal() {
             document.getElementById('institution').value = data.institution || '';
             document.getElementById('supportPhone').value = data.supportPhone || '';
             document.getElementById('deliveryMethod').value = data.credentialDeliveryMethod || 'sms';
+            document.getElementById('semesterStartDate').value = data.semesterStartDate || '';
         }
 
         document.getElementById('settingsModal').style.display = 'block';
@@ -1122,6 +1182,7 @@ async function handleSettingsSave(event) {
             institution: document.getElementById('institution').value,
             supportPhone: document.getElementById('supportPhone').value,
             credentialDeliveryMethod: document.getElementById('deliveryMethod').value,
+            semesterStartDate: document.getElementById('semesterStartDate').value,
         };
 
         await window.db.collection('admin_settings').doc('config').set(settings, { merge: true });

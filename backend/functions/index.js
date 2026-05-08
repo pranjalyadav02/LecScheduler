@@ -202,6 +202,7 @@ exports.cancelLecture = functions.https.onCall(async (data, context) => {
       title: `Lecture Cancelled`,
       message: `A lecture has been cancelled. Check the timetable for details.`,
       affectedLectures: [lectureId],
+      fromName: (await db.collection('users').doc(context.auth.uid).get()).data().name || 'Faculty',
     });
 
     return { success: true, message: 'Lecture cancelled and students notified.' };
@@ -217,7 +218,7 @@ exports.rescheduleLecture = functions.https.onCall(async (data, context) => {
   }
 
   try {
-    const { semesterId, lectureId, newDay, newStartTime, newEndTime } = data;
+    const { semesterId, lectureId, newDay, newDate, newStartTime, newEndTime } = data;
 
     await verifyFacultyAccess(context.auth.uid, semesterId);
 
@@ -227,25 +228,57 @@ exports.rescheduleLecture = functions.https.onCall(async (data, context) => {
     const lectureDoc = await lectureRef.get();
     const oldTime = `${lectureDoc.data().day} ${lectureDoc.data().startTime}`;
 
-    await lectureRef.update({
+    const updateData = {
       day: newDay,
       startTime: newStartTime,
       endTime: newEndTime,
       status: 'rescheduled',
       originalTime: oldTime,
       lastModified: admin.firestore.FieldValue.serverTimestamp(),
-    });
+    };
+
+    if (newDate) {
+      updateData.date = newDate;
+    }
+
+    await lectureRef.update(updateData);
 
     await sendNotification(semesterId, {
       type: 'lecture-rescheduled',
       title: 'Lecture Time Changed',
       message: `A lecture has been rescheduled. Check timetable for new time.`,
       affectedLectures: [lectureId],
+      fromName: (await db.collection('users').doc(context.auth.uid).get()).data().name || 'Faculty',
     });
 
     return { success: true, message: 'Lecture rescheduled and students notified.' };
   } catch (error) {
     console.error('Error rescheduling lecture:', error);
+    return { success: false, message: error.message };
+  }
+});
+
+exports.sendAnnouncement = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'Authentication required.');
+  }
+
+  try {
+    const { semesterId, title, message, fromName } = data;
+
+    await verifyFacultyAccess(context.auth.uid, semesterId);
+
+    await sendNotification(semesterId, {
+      type: 'announcement',
+      title: title || 'New Announcement',
+      message: message,
+      fromName: fromName || 'Staff',
+      sentAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    return { success: true, message: 'Announcement sent.' };
+  } catch (error) {
+    console.error('Error sending announcement:', error);
     return { success: false, message: error.message };
   }
 });
@@ -266,7 +299,7 @@ async function verifyFacultyAccess(uid, semesterId) {
 async function sendNotification(semesterId, payload) {
     await db.collection('semesters').doc(semesterId).collection('notifications').add({
         ...payload,
-        createdAt: admin.firestore.FieldValue.serverTimestamp()
+        sentAt: admin.firestore.FieldValue.serverTimestamp()
     });
 }
 

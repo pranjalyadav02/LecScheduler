@@ -61,6 +61,15 @@ const server = http.createServer((req, res) => {
             filePath = path.join(filePath, 'index.html');
         }
 
+        // If file not found, try adding .html
+        if (err || !stats.isFile()) {
+            const htmlPath = filePath + '.html';
+            if (fs.existsSync(htmlPath)) {
+                filePath = htmlPath;
+                err = null; // Reset error as we found the .html file
+            }
+        }
+
         // Read and serve the file
         fs.readFile(filePath, (err, data) => {
             if (err) {

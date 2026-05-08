@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lecture Scheduler - Faculty Portal</title>
     <link rel="stylesheet" href="/css/faculty.css">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="shortcut icon" href="/favicon.ico">
 </head>
 
 <body>
@@ -20,6 +22,7 @@
             <h1>👨‍🏫 Faculty Portal</h1>
             <div id="facultySummary" class="faculty-summary"></div>
             <div class="header-right">
+                <div id="liveClock" class="live-clock"></div>
                 <div class="global-filter">
                     <label for="dashSemSelect">Semester:</label>
                     <select id="dashSemSelect" onchange="onDashboardSemesterChange()">
@@ -71,14 +74,7 @@
                         <option value="">-- Select Lecture --</option>
                     </select>
                     <label>New Date:</label>
-                    <select id="newDay" required>
-                        <option value="">Select Day</option>
-                        <option value="Monday">Monday</option>
-                        <option value="Tuesday">Tuesday</option>
-                        <option value="Wednesday">Wednesday</option>
-                        <option value="Thursday">Thursday</option>
-                        <option value="Friday">Friday</option>
-                    </select>
+                    <input type="date" id="newDate" required>
                     <label>New Time:</label>
                     <input type="time" id="newStartTime" required>
                     <input type="time" id="newEndTime" required>

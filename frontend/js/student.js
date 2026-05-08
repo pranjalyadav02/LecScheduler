@@ -84,7 +84,10 @@ function switchTab(tabName, evt) {
 
     // Refresh data if needed
     if (tabName === 'timetable') loadTimetable();
-    if (tabName === 'notifications') loadNotifications();
+    if (tabName === 'notifications') {
+        loadNotifications();
+        clearNotificationBadge();
+    }
     // Ensure chat is initialized if switching to chat tab
     if (tabName === 'chat' && typeof initChat === 'function') {
         initChat(currentSemesterId, currentSection, 'chatMessages');
@@ -298,9 +301,11 @@ function renderGridView(lectures, dayOrder) {
             const cell = row.insertCell();
             cell.colSpan = span;
             cell.className = `slot-cell ${isLabLecture(lecture) ? 'lab-slot' : 'theory-slot'} ${conflictMap.get(lecture.id) ? 'clash-slot' : ''}`;
+            const lectureDate = calculateLectureDate(day);
             cell.innerHTML = `
                 <div class="slot-subject">${escapeHtml(lecture.subject || '--')}</div>
                 <div class="slot-faculty">(${escapeHtml(shortFacultyName(lecture.faculty || 'NA'))})</div>
+                <div class="slot-date" style="font-size: 0.7rem; opacity: 0.8; margin-top: 4px;">${lectureDate}</div>
                 ${span > 1 ? `<div class="slot-time">(${lecture.startTime}-${lecture.endTime})</div>` : ''}
             `;
             slotIndex += span;
@@ -319,7 +324,8 @@ function renderListView(lectures, dayOrder) {
         const dayLectures = lectures.filter(l => l.day === day);
         const section = document.createElement('div');
         section.className = 'day-list-block';
-        section.innerHTML = `<h3>${day}</h3>`;
+        const lectureDate = calculateLectureDate(day);
+        section.innerHTML = `<h3>${day} <small style="font-size: 0.8rem; font-weight: normal; color: var(--text-light); margin-left: 10px;">${lectureDate}</small></h3>`;
 
         if (!dayLectures.length) {
             section.innerHTML += '<p class="empty-slot">-</p>';
@@ -468,6 +474,14 @@ async function loadNotifications() {
             const item = document.createElement('div');
             item.className = 'notification-item';
             
+            // Check if it's new
+            const sentAt = notif.sentAt ? notif.sentAt.toDate().getTime() : 0;
+            const lastSeen = parseInt(localStorage.getItem(`lastSeenNotif_${currentSemesterId}`) || '0');
+            if (sentAt > lastSeen) {
+                item.classList.add('new-notif');
+                item.style.borderLeftColor = 'var(--primary-color)';
+            }
+            
             const timestamp = notif.sentAt ? new Date(notif.sentAt.toDate()).toLocaleString() : '--';
             const icon = getNotificationIcon(notif.type);
 
@@ -479,6 +493,9 @@ async function loadNotifications() {
                 <div class="notification-body">
                     ${notif.message}
                 </div>
+                <div class="notification-footer" style="margin-top: 8px; font-size: 0.8rem; color: var(--text-light);">
+                    ${notif.fromName ? `<span>From: <strong>${notif.fromName}</strong></span>` : ''}
+                </div>
                 ${notif.type === 'lecture-cancelled' || notif.type === 'lecture-rescheduled' ? 
                   '<p class="notification-hint">Check your timetable for changes.</p>' : ''}
             `;
@@ -486,9 +503,40 @@ async function loadNotifications() {
         });
 
         showStatus('notificationsStatus', '✓ Notifications loaded', 'success');
+        updateNotificationBadge(notifications);
     } catch (error) {
         showStatus('notificationsStatus', `Error: ${error.message}`, 'error');
     }
+}
+
+function updateNotificationBadge(snapshot) {
+    const lastSeen = parseInt(localStorage.getItem(`lastSeenNotif_${currentSemesterId}`) || '0');
+    let unreadCount = 0;
+    
+    snapshot.forEach(doc => {
+        const notif = doc.data();
+        const sentAt = notif.sentAt ? notif.sentAt.toDate().getTime() : 0;
+        if (sentAt > lastSeen) unreadCount++;
+    });
+
+    const badge = document.getElementById('notifBadge');
+    if (badge) {
+        if (unreadCount > 0) {
+            badge.textContent = unreadCount;
+            badge.style.display = 'inline-block';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+}
+
+function clearNotificationBadge() {
+    const badge = document.getElementById('notifBadge');
+    if (badge) {
+        badge.style.display = 'none';
+    }
+    // Update last seen to now
+    localStorage.setItem(`lastSeenNotif_${currentSemesterId}`, Date.now().toString());
 }
 
 function getNotificationIcon(type) {
@@ -548,8 +596,9 @@ function setupLiveUpdates() {
         window.db.collection('semesters').doc(currentSemesterId)
             .collection('notifications')
             .orderBy('sentAt', 'desc')
-            .limit(5)
-            .onSnapshot(() => {
+            .limit(10)
+            .onSnapshot(snapshot => {
+                updateNotificationBadge(snapshot);
                 // Refresh if in notifications tab
                 if (document.getElementById('notifications').classList.contains('active')) {
                     loadNotifications();
@@ -576,6 +625,22 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+function calculateLectureDate(dayName) {
+    const dayOrder = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const targetDayIndex = dayOrder.indexOf(dayName);
+    if (targetDayIndex === -1) return '';
+
+    const today = new Date();
+    const currentDayIndex = today.getDay();
+    
+    // Calculate the difference to the target day in the current week
+    const diff = targetDayIndex - currentDayIndex;
+    const targetDate = new Date(today);
+    targetDate.setDate(today.getDate() + diff);
+
+    return targetDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
 }
 
 function showError(message) {

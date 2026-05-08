@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lecture Scheduler - Admin Dashboard</title>
     <link rel="stylesheet" href="/css/admin.css">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="shortcut icon" href="/favicon.ico">
 </head>
 
 <body>
@@ -19,6 +21,7 @@
         <header class="admin-header">
             <h1>📚 Lecture Scheduler Admin</h1>
             <div class="header-right">
+                <div id="liveClock" class="live-clock"></div>
                 <span id="adminName">Admin</span>
                 <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
@@ -129,9 +132,14 @@
 
     <!-- Timetable Modal -->
     <div id="timetableModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content wide-modal">
             <span class="close-modal" onclick="closeTimetableModal()">&times;</span>
             <h2>Semester Timetable</h2>
+            <div class="modal-filters">
+                <select id="modalSecFilter" onchange="filterTimetableBySection()" style="margin-bottom: 15px; max-width: 200px;">
+                    <option value="">All Sections</option>
+                </select>
+            </div>
             <div id="timetableList" class="list-container"></div>
         </div>
     </div>
@@ -208,6 +216,10 @@
                         <option value="sms">SMS</option>
                         <option value="whatsapp">WhatsApp</option>
                     </select>
+                </label>
+                <label>
+                    Semester Start Date:
+                    <input type="date" id="semesterStartDate" required>
                 </label>
                 <button type="submit" class="primary-btn">Save Settings</button>
             </form>

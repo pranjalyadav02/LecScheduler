@@ -47,7 +47,7 @@ async function sendMessage(semesterId, section, text, senderId, senderName) {
 }
 
 /**
- * Render messages in the UI
+ * Render messages in the UI with WhatsApp-style date grouping
  */
 function renderMessages(messages, containerId) {
     const container = document.getElementById(containerId);
@@ -59,12 +59,35 @@ function renderMessages(messages, containerId) {
     }
 
     container.innerHTML = '';
+    let lastDateStr = '';
+
     messages.forEach(msg => {
+        const date = msg.timestamp ? msg.timestamp.toDate() : new Date();
+        const dateStr = date.toLocaleDateString();
+        
+        // Date separator logic
+        if (dateStr !== lastDateStr) {
+            const separator = document.createElement('div');
+            separator.className = 'chat-date-separator';
+            
+            const today = new Date().toLocaleDateString();
+            const yesterday = new Date(Date.now() - 86400000).toLocaleDateString();
+            
+            let displayDate = dateStr;
+            if (dateStr === today) displayDate = 'Today';
+            else if (dateStr === yesterday) displayDate = 'Yesterday';
+            else displayDate = date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+            
+            separator.innerHTML = `<span>${displayDate}</span>`;
+            container.appendChild(separator);
+            lastDateStr = dateStr;
+        }
+
         const isMe = msg.senderId === (window.auth.currentUser ? window.auth.currentUser.uid : null);
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${isMe ? 'sent' : 'received'}`;
         
-        const timestamp = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
+        const timestamp = msg.timestamp ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
         
         msgDiv.innerHTML = `
             ${!isMe ? `<div class="msg-sender">${msg.senderName}</div>` : ''}

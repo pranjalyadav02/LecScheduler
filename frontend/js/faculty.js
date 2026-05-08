@@ -234,16 +234,35 @@ async function handleCancelLecture(event) {
 
     try {
         showStatus('cancelStatus', 'Cancelling lecture...', 'info');
-        const cancelLecture = window.functions.httpsCallable('cancelLecture');
-        const result = await cancelLecture({ semesterId: currentSemesterId, lectureId, reason });
+        const facultyName = document.getElementById('facultyName').textContent;
+        
+        const batch = window.db.batch();
+        const lectureRef = window.db.collection('semesters').doc(currentSemesterId)
+            .collection('lectures').doc(lectureId);
+        
+        batch.update(lectureRef, {
+            status: 'cancelled',
+            cancelReason: reason || 'No reason provided',
+            lastModified: window.firebase.firestore.FieldValue.serverTimestamp()
+        });
 
-        if (result.data.success) {
-            showStatus('cancelStatus', '✓ Lecture cancelled. Students notified.', 'success');
-            document.getElementById('cancelReason').value = '';
-            await loadMyLecturesForSelect();
-        } else {
-            showStatus('cancelStatus', `Error: ${result.data.message}`, 'error');
-        }
+        const notifRef = window.db.collection('semesters').doc(currentSemesterId)
+            .collection('notifications').doc();
+        
+        batch.set(notifRef, {
+            type: 'lecture-cancelled',
+            title: 'Lecture Cancelled',
+            message: `A lecture has been cancelled. Check the timetable for details.`,
+            affectedLectures: [lectureId],
+            fromName: facultyName,
+            sentAt: window.firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        await batch.commit();
+
+        showStatus('cancelStatus', '✓ Lecture cancelled. Students notified.', 'success');
+        document.getElementById('cancelReason').value = '';
+        await loadMyLecturesForSelect();
     } catch (error) {
         showStatus('cancelStatus', `Failed: ${error.message}`, 'error');
     }
@@ -252,14 +271,18 @@ async function handleCancelLecture(event) {
 async function handleRescheduleLecture(event) {
     event.preventDefault();
     const lectureId = document.getElementById('rescheduleLectureSelect').value;
-    const newDay = document.getElementById('newDay').value;
+    const newDateStr = document.getElementById('newDate').value;
     const newStartTime = document.getElementById('newStartTime').value;
     const newEndTime = document.getElementById('newEndTime').value;
 
-    if (!lectureId || !newDay || !newStartTime || !newEndTime) {
+    if (!lectureId || !newDateStr || !newStartTime || !newEndTime) {
         showStatus('rescheduleStatus', 'Please fill all fields', 'warning');
         return;
     }
+
+    const dateObj = new Date(newDateStr);
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const newDay = dayNames[dateObj.getDay()];
 
     try {
         showStatus('rescheduleStatus', 'Checking availability...', 'info');
@@ -278,21 +301,42 @@ async function handleRescheduleLecture(event) {
         }
 
         showStatus('rescheduleStatus', 'Rescheduling lecture...', 'info');
-        const rescheduleLecture = window.functions.httpsCallable('rescheduleLecture');
-        const result = await rescheduleLecture({
-            semesterId: currentSemesterId,
-            lectureId,
-            newDay,
-            newStartTime,
-            newEndTime
+        const facultyName = document.getElementById('facultyName').textContent;
+
+        const batch = window.db.batch();
+        const lectureRef = window.db.collection('semesters').doc(currentSemesterId)
+            .collection('lectures').doc(lectureId);
+
+        const updateData = {
+            day: newDay,
+            startTime: newStartTime,
+            endTime: newEndTime,
+            status: 'rescheduled',
+            lastModified: window.firebase.firestore.FieldValue.serverTimestamp()
+        };
+        if (newDateStr) updateData.date = newDateStr;
+        
+        batch.update(lectureRef, updateData);
+
+        const notifRef = window.db.collection('semesters').doc(currentSemesterId)
+            .collection('notifications').doc();
+            
+        batch.set(notifRef, {
+            type: 'lecture-rescheduled',
+            title: 'Lecture Time Changed',
+            message: `A lecture has been rescheduled. Check timetable for new time.`,
+            affectedLectures: [lectureId],
+            fromName: facultyName,
+            sentAt: window.firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        if (result.data.success) {
-            showStatus('rescheduleStatus', '✓ Lecture rescheduled. Students notified.', 'success');
-            await loadMyLecturesForSelect();
-        } else {
-            showStatus('rescheduleStatus', `Error: ${result.data.message}`, 'error');
-        }
+        await batch.commit();
+
+        showStatus('rescheduleStatus', '✓ Lecture rescheduled. Students notified.', 'success');
+        document.getElementById('newDate').value = '';
+        document.getElementById('newStartTime').value = '';
+        document.getElementById('newEndTime').value = '';
+        await loadMyLecturesForSelect();
     } catch (error) {
         showStatus('rescheduleStatus', `Failed: ${error.message}`, 'error');
     }
@@ -310,16 +354,22 @@ async function handleFacultyAnnouncement(event) {
 
     try {
         showStatus('facultyAnnouncementStatus', 'Sending announcement...', 'info');
-        const sendAnnouncement = window.functions.httpsCallable('sendAnnouncement');
-        const result = await sendAnnouncement({ semesterId: currentSemesterId, title, message });
+        const facultyName = document.getElementById('facultyName').textContent;
+        
+        const announcementData = {
+            type: 'announcement',
+            title: title || 'New Announcement',
+            message: message,
+            fromName: facultyName,
+            sentAt: window.firebase.firestore.FieldValue.serverTimestamp(),
+        };
 
-        if (result.data.success) {
-            showStatus('facultyAnnouncementStatus', '✓ Announcement sent.', 'success');
-            document.getElementById('facultyAnnouncementTitle').value = '';
-            document.getElementById('facultyAnnouncementMsg').value = '';
-        } else {
-            showStatus('facultyAnnouncementStatus', `Error: ${result.data.message}`, 'error');
-        }
+        await window.db.collection('semesters').doc(currentSemesterId)
+            .collection('notifications').add(announcementData);
+
+        showStatus('facultyAnnouncementStatus', '✓ Announcement sent.', 'success');
+        document.getElementById('facultyAnnouncementTitle').value = '';
+        document.getElementById('facultyAnnouncementMsg').value = '';
     } catch (error) {
         showStatus('facultyAnnouncementStatus', `Failed: ${error.message}`, 'error');
     }
@@ -329,11 +379,13 @@ async function showLectureHistory() {
     if (!currentSemesterId) return;
 
     try {
-        const lectures = await window.db.collection('semesters').doc(currentSemesterId)
+        const snapshot = await window.db.collection('semesters').doc(currentSemesterId)
             .collection('lectures')
             .where('facultyId', '==', currentFacultyId)
-            .orderBy('lastModified', 'desc')
             .get();
+
+        const lectures = snapshot.docs.map(doc => doc.data())
+            .sort((a, b) => (b.lastModified?.toDate() || 0) - (a.lastModified?.toDate() || 0));
 
         const listDiv = document.getElementById('historyList');
         listDiv.innerHTML = '';
@@ -463,12 +515,12 @@ async function checkSlotAvailability(day, start, end, section, room, excludeId) 
         const snapshot = await window.db.collection('semesters').doc(currentSemesterId)
             .collection('lectures')
             .where('day', '==', day)
-            .where('status', '==', 'scheduled')
             .get();
 
         const collision = snapshot.docs.find(doc => {
-            if (doc.id === excludeId) return false;
             const l = doc.data();
+            if (doc.id === excludeId) return false;
+            if (l.status !== 'scheduled') return false;
             
             // Check if section or room is same
             const sameGroup = (l.section === section || l.room === room);

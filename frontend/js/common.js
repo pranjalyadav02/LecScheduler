@@ -57,4 +57,33 @@ window.showStatus = showStatus;
 window.showError = showError;
 window.logout = logout;
 
-// Optionally export other helpers in future
+/**
+ * Initialize a live clock in the element with id 'liveClock'
+ */
+function startClock() {
+    const clockElement = document.getElementById('liveClock');
+    if (!clockElement) return;
+
+    function updateClock() {
+        const now = new Date();
+        const options = { 
+            weekday: 'short', 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric',
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit',
+            hour12: true 
+        };
+        clockElement.textContent = now.toLocaleString('en-US', options);
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+}
+
+window.startClock = startClock;
+
+// Run clock if element exists
+document.addEventListener('DOMContentLoaded', startClock);
