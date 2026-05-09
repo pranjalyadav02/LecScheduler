@@ -15,7 +15,16 @@ const CACHE_EXPIRY = 60 * 60 * 1000;
 // Map semester IDs to resource folder URLs (Google Drive)
 // Add more semester IDs and URLs here as needed.
 const RESOURCES_MAP = {
-    'mca_semester_ii': 'https://drive.google.com/drive/folders/1KKPE_UxfwgizwYIcscB8egV-CneVLaRf'
+    'mca_semester_i': 'https://drive.google.com/drive/folders/1ElmOMsjM0YfK0nHimOsJtmBdxQYmwmwT',
+    'mca_semester_ii': 'https://drive.google.com/drive/folders/1KKPE_UxfwgizwYIcscB8egV-CneVLaRf',
+    'mca_semester_iii': 'https://drive.google.com/drive/folders/1EJHcrKMQoG2uBgaF95zIv5Ee6mEPcUU_',
+    'mca_semester_iv': 'https://drive.google.com/drive/folders/1dAX664sHn5JsJy5neXSssS1x8QWWWg9w',
+    'mca_semester_v': 'https://drive.google.com/drive/folders/1Nh9D3SCqSu0H-8gWVB0_EPN9ssToyBiZ',
+    'mca_semester_vi': 'https://drive.google.com/drive/folders/1BcJndMZqgshdK-ZbdeAXrTfzGqy1qe2e',
+    'mca_semester_vii': 'https://drive.google.com/drive/folders/1QTEvTJQ24wCXDy7eomka41z0jCmjfwu6',
+    'mca_semester_viii': 'https://drive.google.com/drive/folders/1A6vymlj3YNa91WTzaHYWIMQdHpNHgMxK',
+    'mca_semester_ix': 'https://drive.google.com/drive/folders/1qnKTEDbSsed1RKaLLKyPl9L-f9mRKwgc',
+    'mca_semester_x': 'https://drive.google.com/drive/folders/18FAPEjtbwjxaIl3n5IC9tmphDFW4EHoQ'
 };
 
 // ============================================================================
