@@ -559,12 +559,14 @@ function clearNotificationBadge() {
     try {
         const user = window.auth.currentUser;
         if (user && currentSemesterId) {
-            const updateObj = {};
-            updateObj[`lastSeenNotif.${currentSemesterId}`] = ts;
-            window.db.collection('users').doc(user.uid).update(updateObj).then(() => {
+            const setObj = { lastSeenNotif: {} };
+            setObj.lastSeenNotif[currentSemesterId] = ts;
+            // Use set with merge to reliably update nested map without overwriting other fields
+            window.db.collection('users').doc(user.uid).set(setObj, { merge: true }).then(() => {
                 // update local cache
                 window.userLastSeenMap = window.userLastSeenMap || {};
                 window.userLastSeenMap[currentSemesterId] = ts;
+                console.log('Persisted lastSeenNotif for', currentSemesterId, '->', ts);
             }).catch(err => {
                 console.warn('Failed to persist lastSeen to Firestore:', err);
             });
