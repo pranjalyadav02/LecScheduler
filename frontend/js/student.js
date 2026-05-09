@@ -598,6 +598,12 @@ async function clearNotificationLog() {
         const ok = await clearNotificationBadge();
         if (ok) {
             showStatus('notificationsStatus', '✓ Notification log cleared', 'success');
+            // Refresh notifications list so UI reflects the persisted lastSeen
+            try {
+                if (typeof loadNotifications === 'function') await loadNotifications();
+            } catch (e) {
+                console.warn('Failed to reload notifications after clearing:', e);
+            }
         } else {
             showStatus('notificationsStatus', '✓ Locally cleared, but failed to persist remotely', 'warning');
         }
