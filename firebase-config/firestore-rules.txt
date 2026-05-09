@@ -41,12 +41,28 @@ service cloud.firestore {
     }
 
     // ========================================================================
-    // USERS COLLECTION (Admin only for writes)
+    // USERS COLLECTION
+    // - Admins can create/modify/delete users
+    // - Authenticated users may read their own document
+    // - Authenticated users may ONLY update their own `lastSeenNotif` map (merge/update)
     // ========================================================================
     match /users/{userId} {
-      // Only admin can create/modify users
       allow read: if isAuthenticated() && (isAdmin() || request.auth.uid == userId);
-      allow write: if isAdmin();
+
+      // Admins may create any user documents
+      allow create: if isAdmin();
+
+      // Admins may update freely. Non-admin users may only change their own
+      // `lastSeenNotif` entries — ensure the update's affected keys are limited
+      // so other fields cannot be overwritten by the client.
+      allow update: if isAdmin() || (
+        request.auth != null && request.auth.uid == userId &&
+        // only lastSeenNotif may be affected by this update
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastSeenNotif'])
+      );
+
+      // Only admins may delete user documents
+      allow delete: if isAdmin();
     }
 
     // ========================================================================
@@ -136,7 +152,10 @@ service cloud.firestore {
           );
           allow read: if isAuthenticated() && hasSemesterAccess(semesterId);
           allow update: if false; // Messages cannot be edited
-          allow delete: if isAdmin();
+          // Allow delete if admin or the original sender (authenticated)
+          allow delete: if isAdmin() || (
+            request.auth != null && resource.data.senderId == request.auth.uid
+          );
         }
       }
     }
