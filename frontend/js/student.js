@@ -646,6 +646,50 @@ function setupLiveUpdates() {
 // UTILITIES
 // ============================================================================
 
+// PWA install prompt handling
+let __deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent automatic prompt
+    e.preventDefault();
+    __deferredInstallPrompt = e;
+    // Show install button when prompt available
+    const btn = document.getElementById('installBtn');
+    if (btn) btn.style.display = 'inline-block';
+});
+
+window.addEventListener('appinstalled', (evt) => {
+    // Hide install button once installed
+    const btn = document.getElementById('installBtn');
+    if (btn) btn.style.display = 'none';
+    __deferredInstallPrompt = null;
+    console.log('PWA installed');
+});
+
+async function triggerInstallPrompt() {
+    try {
+        if (!__deferredInstallPrompt) {
+            // No deferred prompt available
+            const btn = document.getElementById('installBtn');
+            if (btn) btn.style.display = 'none';
+            return;
+        }
+
+        __deferredInstallPrompt.prompt();
+        const choiceResult = await __deferredInstallPrompt.userChoice;
+        if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+        } else {
+            console.log('User dismissed the install prompt');
+        }
+        __deferredInstallPrompt = null;
+        const btn = document.getElementById('installBtn');
+        if (btn) btn.style.display = 'none';
+    } catch (err) {
+        console.warn('Error showing install prompt:', err);
+    }
+}
+
 function showStatus(elementId, message, type) {
     const element = document.getElementById(elementId);
     if (element) {
