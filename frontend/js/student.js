@@ -546,7 +546,7 @@ function updateNotificationBadge(snapshot) {
     }
 }
 
-function clearNotificationBadge() {
+async function clearNotificationBadge() {
     const badge = document.getElementById('notifBadge');
     if (badge) {
         badge.style.display = 'none';
@@ -562,17 +562,17 @@ function clearNotificationBadge() {
             const setObj = { lastSeenNotif: {} };
             setObj.lastSeenNotif[currentSemesterId] = ts;
             // Use set with merge to reliably update nested map without overwriting other fields
-            window.db.collection('users').doc(user.uid).set(setObj, { merge: true }).then(() => {
-                // update local cache
-                window.userLastSeenMap = window.userLastSeenMap || {};
-                window.userLastSeenMap[currentSemesterId] = ts;
-                console.log('Persisted lastSeenNotif for', currentSemesterId, '->', ts);
-            }).catch(err => {
-                console.warn('Failed to persist lastSeen to Firestore:', err);
-            });
+            await window.db.collection('users').doc(user.uid).set(setObj, { merge: true });
+            // update local cache
+            window.userLastSeenMap = window.userLastSeenMap || {};
+            window.userLastSeenMap[currentSemesterId] = ts;
+            console.log('Persisted lastSeenNotif for', currentSemesterId, '->', ts);
+            return true;
         }
+        return false;
     } catch (e) {
         console.warn('Error persisting lastSeen:', e);
+        return false;
     }
 }
 
@@ -595,8 +595,12 @@ async function clearNotificationLog() {
             listDiv.innerHTML = '<p class="empty-message">No notifications yet. Check back soon.</p>';
         }
 
-        clearNotificationBadge();
-        showStatus('notificationsStatus', '✓ Notification log cleared', 'success');
+        const ok = await clearNotificationBadge();
+        if (ok) {
+            showStatus('notificationsStatus', '✓ Notification log cleared', 'success');
+        } else {
+            showStatus('notificationsStatus', '✓ Locally cleared, but failed to persist remotely', 'warning');
+        }
     } catch (err) {
         showStatus('notificationsStatus', `Error clearing notifications: ${err.message}`, 'error');
     }
