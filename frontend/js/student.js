@@ -546,6 +546,32 @@ function clearNotificationBadge() {
     localStorage.setItem(`lastSeenNotif_${currentSemesterId}`, Date.now().toString());
 }
 
+/**
+ * Clear Notification Log for the current student view
+ * Marks all notifications as seen (updates localStorage) and clears the list UI
+ */
+async function clearNotificationLog() {
+    try {
+        if (!currentSemesterId) return;
+        // Confirm with user
+        if (!confirm('Clear notification log for this semester? This will mark all notifications as read for your account.')) return;
+
+        // Mark all as seen locally
+        localStorage.setItem(`lastSeenNotif_${currentSemesterId}`, Date.now().toString());
+
+        // Optionally, we could remove notifications from UI but keep them in the DB
+        const listDiv = document.getElementById('notificationsList');
+        if (listDiv) {
+            listDiv.innerHTML = '<p class="empty-message">No notifications yet. Check back soon.</p>';
+        }
+
+        clearNotificationBadge();
+        showStatus('notificationsStatus', '✓ Notification log cleared', 'success');
+    } catch (err) {
+        showStatus('notificationsStatus', `Error clearing notifications: ${err.message}`, 'error');
+    }
+}
+
 function getNotificationIcon(type) {
     switch(type) {
         case 'lecture-cancelled': return '❌';

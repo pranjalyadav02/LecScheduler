@@ -70,6 +70,12 @@
             <section id="notifications" class="tab-content">
                 <h2>Notifications & Announcements</h2>
                 <p class="instructions">View important updates about lectures and events.</p>
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px">
+                    <div style="flex:1"></div>
+                    <div>
+                        <button id="clearNotifBtn" class="secondary-btn" onclick="clearNotificationLog()">Clear Notification Log</button>
+                    </div>
+                </div>
 
                 <div id="notificationsList" class="notifications-list">
                     <!-- Dynamically populated -->
@@ -108,7 +114,8 @@
     <!-- Service Worker for offline support -->
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/js/service-worker.js').catch(err => {
+            // Register the app service worker (main app) at the site root
+            navigator.serviceWorker.register('/sw.js').catch(err => {
                 console.log('Service Worker registration failed:', err);
             });
         }
