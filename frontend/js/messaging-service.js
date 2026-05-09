@@ -49,16 +49,20 @@ async function getFCMToken() {
         }
 
         // Register service worker for Firebase Messaging
+        // Register and wait for the Firebase messaging service worker
+        let registration = null;
         try {
-            const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-            console.log('✓ Firebase messaging service worker registered');
+            registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+            await navigator.serviceWorker.ready;
+            console.log('✓ Firebase messaging service worker registered (scope:', registration.scope, ')');
         } catch (err) {
             console.warn('Could not register Firebase messaging SW:', err);
         }
 
-        // Get token from Firebase Messaging
+        // Get token from Firebase Messaging, prefer passing service worker registration
         const token = await window.messaging.getToken({
-            vapidKey: 'BJ4LBbJp6W9fClW0ueEdHpSxMwOW90zaQEhULn9LztIIGDxOpPgTAu-vGVF1Y63ruC0oJgKt6hffVKld7wdCB6Y' // Web Push Certificate from Firebase Console
+            vapidKey: 'BJ4LBbJp6W9fClW0ueEdHpSxMwOW90zaQEhULn9LztIIGDxOpPgTAu-vGVF1Y63ruC0oJgKt6hffVKld7wdCB6Y', // Web Push Certificate from Firebase Console
+            serviceWorkerRegistration: registration || undefined
         });
 
         if (token) {
@@ -133,7 +137,7 @@ function setupMessageListener() {
                     requireInteraction: true
                 };
 
-                // Show notification using Service Worker
+                // Show notification using Service Worker if available, otherwise use Notification API
                 if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
                     navigator.serviceWorker.controller.postMessage({
                         type: 'SHOW_NOTIFICATION',
@@ -141,6 +145,12 @@ function setupMessageListener() {
                         options: notificationOptions,
                         data: payload.data || {}
                     });
+                } else if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+                    try {
+                        new Notification(title, notificationOptions);
+                    } catch (e) {
+                        console.warn('Failed to show Notification via API:', e);
+                    }
                 }
             }
 
@@ -166,19 +176,94 @@ async function initializeMessaging() {
         
         // Request permission and get token
         const token = await requestNotificationPermission();
-        
+
         if (token) {
             // Set up foreground message handler
             setupMessageListener();
             console.log('✓ Messaging service initialized');
             return true;
         } else {
+            // If permission was not granted, show an on-page prompt to the user
+            if (typeof Notification !== 'undefined') {
+                if (Notification.permission === 'default') {
+                    showNotificationPermissionPrompt();
+                } else if (Notification.permission === 'denied') {
+                    console.warn('Notification permission denied. User must enable notifications from browser settings.');
+                }
+            }
             console.log('⚠ Notification permission not granted');
             return false;
         }
     } catch (error) {
         console.error('Error initializing messaging:', error);
         return false;
+    }
+}
+
+
+/**
+ * Show a small banner prompting the user to enable notifications.
+ * The prompt must be triggered by a user gesture when requesting permission.
+ */
+function showNotificationPermissionPrompt() {
+    try {
+        // Avoid duplicate prompts
+        if (document.getElementById('enableNotificationsBanner')) return;
+
+        const banner = document.createElement('div');
+        banner.id = 'enableNotificationsBanner';
+        banner.style.position = 'fixed';
+        banner.style.bottom = '16px';
+        banner.style.left = '16px';
+        banner.style.right = '16px';
+        banner.style.zIndex = 9999;
+        banner.style.background = 'linear-gradient(90deg, #fff, #f7f7f7)';
+        banner.style.border = '1px solid rgba(0,0,0,0.08)';
+        banner.style.padding = '12px 14px';
+        banner.style.boxShadow = '0 6px 18px rgba(0,0,0,0.08)';
+        banner.style.display = 'flex';
+        banner.style.alignItems = 'center';
+        banner.style.justifyContent = 'space-between';
+        banner.style.borderRadius = '6px';
+
+        const text = document.createElement('div');
+        text.style.flex = '1';
+        text.style.marginRight = '12px';
+        text.textContent = 'Enable notifications to receive important announcements in your device notification bar.';
+
+        const actions = document.createElement('div');
+
+        const enableBtn = document.createElement('button');
+        enableBtn.textContent = 'Enable Notifications';
+        enableBtn.style.marginRight = '8px';
+        enableBtn.className = 'btn btn-primary';
+        enableBtn.onclick = async () => {
+            // This click is a user gesture — request permission now
+            enableBtn.disabled = true;
+            const token = await requestNotificationPermission();
+            if (token) {
+                setupMessageListener();
+                banner.remove();
+                console.log('Notifications enabled via prompt');
+            } else {
+                enableBtn.disabled = false;
+                alert('Could not enable notifications. Please check your browser settings.');
+            }
+        };
+
+        const dismiss = document.createElement('button');
+        dismiss.textContent = 'Dismiss';
+        dismiss.className = 'btn btn-secondary';
+        dismiss.onclick = () => banner.remove();
+
+        actions.appendChild(enableBtn);
+        actions.appendChild(dismiss);
+
+        banner.appendChild(text);
+        banner.appendChild(actions);
+        document.body.appendChild(banner);
+    } catch (e) {
+        console.warn('Failed to show notification prompt:', e);
     }
 }
 
