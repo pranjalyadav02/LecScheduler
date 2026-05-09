@@ -12,6 +12,12 @@ let currentTimetableView = 'grid';
 // Cache expiry (1 hour)
 const CACHE_EXPIRY = 60 * 60 * 1000;
 
+// Map semester IDs to resource folder URLs (Google Drive)
+// Add more semester IDs and URLs here as needed.
+const RESOURCES_MAP = {
+    'mca_semester_ii': 'https://drive.google.com/drive/folders/1KKPE_UxfwgizwYIcscB8egV-CneVLaRf'
+};
+
 // ============================================================================
 // INITIALIZATION
 // ============================================================================
@@ -37,6 +43,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             document.getElementById('studentName').textContent = user.displayName || 'Student';
             currentStudentId = user.uid;
+
+            // Wire Resources button
+            const resBtn = document.getElementById('resourcesBtn');
+            if (resBtn) {
+                resBtn.onclick = () => openResources();
+            }
 
             // Get semester and section
             const semesters = userDoc.data().semesters || [];
@@ -735,4 +747,18 @@ function logout() {
     }).catch(error => {
         showError(error.message);
     });
+}
+
+/**
+ * Open resources for the current semester in a new tab.
+ * Falls back to a general URL if semester-specific link not configured.
+ */
+function openResources(semesterId) {
+    const sem = semesterId || currentSemesterId;
+    const url = RESOURCES_MAP[sem] || RESOURCES_MAP['default'] || 'https://drive.google.com/drive/folders/1KKPE_UxfwgizwYIcscB8egV-CneVLaRf';
+    try {
+        window.open(url, '_blank');
+    } catch (e) {
+        alert('Unable to open resources. Please check your popup blocker settings.');
+    }
 }
