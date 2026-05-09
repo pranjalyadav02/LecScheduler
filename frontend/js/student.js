@@ -27,6 +27,19 @@ const RESOURCES_MAP = {
     'mca_semester_x': 'https://drive.google.com/drive/folders/18FAPEjtbwjxaIl3n5IC9tmphDFW4EHoQ'
 };
 
+// Normalize various Firestore timestamp representations to milliseconds
+function toMillis(val) {
+    if (!val) return 0;
+    if (typeof val === 'number') return val;
+    if (val instanceof Date) return val.getTime();
+    if (val && typeof val.toMillis === 'function') return val.toMillis();
+    if (val && typeof val.toDate === 'function') return val.toDate().getTime();
+    // Firestore may return { seconds, nanoseconds }
+    if (val && typeof val.seconds === 'number') return (val.seconds * 1000) + Math.floor((val.nanoseconds || 0) / 1000000);
+    const parsed = parseInt(val);
+    return Number.isFinite(parsed) ? parsed : 0;
+}
+
 // ============================================================================
 // INITIALIZATION
 // ============================================================================
@@ -48,7 +61,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             // Cache server-side "last seen" timestamps for notifications per semester
-            window.userLastSeenMap = userDoc.data().lastSeenNotif || {};
+            const rawMap = userDoc.data().lastSeenNotif || {};
+            window.userLastSeenMap = {};
+            Object.keys(rawMap).forEach(k => {
+                window.userLastSeenMap[k] = toMillis(rawMap[k]);
+            });
 
             document.getElementById('studentName').textContent = user.displayName || 'Student';
             currentStudentId = user.uid;
@@ -487,8 +504,8 @@ async function loadNotifications() {
 
         // Determine lastSeen combining local and server-side values
         const localLastSeen = parseInt(localStorage.getItem(`lastSeenNotif_${currentSemesterId}`) || '0');
-        const serverLastSeen = (window.userLastSeenMap && window.userLastSeenMap[currentSemesterId]) || 0;
-        const lastSeen = Math.max(localLastSeen, serverLastSeen || 0);
+        const serverLastSeen = toMillis((window.userLastSeenMap && window.userLastSeenMap[currentSemesterId]) || 0);
+        const lastSeen = Math.max(localLastSeen || 0, serverLastSeen || 0);
         console.log('loadNotifications lastSeen:', { localLastSeen, serverLastSeen, lastSeen });
         // Update debug display
         try {
@@ -570,13 +587,13 @@ async function loadNotifications() {
 
 function updateNotificationBadge(snapshot) {
     const localLastSeen = parseInt(localStorage.getItem(`lastSeenNotif_${currentSemesterId}`) || '0');
-    const serverLastSeen = (window.userLastSeenMap && window.userLastSeenMap[currentSemesterId]) || 0;
-    const lastSeen = Math.max(localLastSeen, serverLastSeen || 0);
+    const serverLastSeen = toMillis((window.userLastSeenMap && window.userLastSeenMap[currentSemesterId]) || 0);
+    const lastSeen = Math.max(localLastSeen || 0, serverLastSeen || 0);
     let unreadCount = 0;
     
     snapshot.forEach(doc => {
         const notif = doc.data();
-        const sentAt = notif.sentAt ? notif.sentAt.toDate().getTime() : 0;
+        const sentAt = notif.sentAt ? (typeof notif.sentAt.toDate === 'function' ? notif.sentAt.toDate().getTime() : (typeof notif.sentAt === 'number' ? notif.sentAt : toMillis(notif.sentAt))) : 0;
         if (sentAt > lastSeen) unreadCount++;
     });
 
