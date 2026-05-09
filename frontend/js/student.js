@@ -32,6 +32,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
+            // Cache server-side "last seen" timestamps for notifications per semester
+            window.userLastSeenMap = userDoc.data().lastSeenNotif || {};
+
             document.getElementById('studentName').textContent = user.displayName || 'Student';
             currentStudentId = user.uid;
 
@@ -461,6 +464,11 @@ async function loadNotifications() {
     try {
         showStatus('notificationsStatus', 'Loading notifications...', 'info');
 
+        // Determine lastSeen combining local and server-side values
+        const localLastSeen = parseInt(localStorage.getItem(`lastSeenNotif_${currentSemesterId}`) || '0');
+        const serverLastSeen = (window.userLastSeenMap && window.userLastSeenMap[currentSemesterId]) || 0;
+        const lastSeen = Math.max(localLastSeen, serverLastSeen || 0);
+
         const notifications = await window.db.collection('semesters').doc(currentSemesterId)
             .collection('notifications')
             .orderBy('sentAt', 'desc')
@@ -481,9 +489,8 @@ async function loadNotifications() {
             const item = document.createElement('div');
             item.className = 'notification-item';
             
-            // Check if it's new
+            // Check if it's new (compare against combined lastSeen)
             const sentAt = notif.sentAt ? notif.sentAt.toDate().getTime() : 0;
-            const lastSeen = parseInt(localStorage.getItem(`lastSeenNotif_${currentSemesterId}`) || '0');
             if (sentAt > lastSeen) {
                 item.classList.add('new-notif');
                 item.style.borderLeftColor = 'var(--primary-color)';
@@ -517,7 +524,9 @@ async function loadNotifications() {
 }
 
 function updateNotificationBadge(snapshot) {
-    const lastSeen = parseInt(localStorage.getItem(`lastSeenNotif_${currentSemesterId}`) || '0');
+    const localLastSeen = parseInt(localStorage.getItem(`lastSeenNotif_${currentSemesterId}`) || '0');
+    const serverLastSeen = (window.userLastSeenMap && window.userLastSeenMap[currentSemesterId]) || 0;
+    const lastSeen = Math.max(localLastSeen, serverLastSeen || 0);
     let unreadCount = 0;
     
     snapshot.forEach(doc => {
@@ -543,7 +552,26 @@ function clearNotificationBadge() {
         badge.style.display = 'none';
     }
     // Update last seen to now
-    localStorage.setItem(`lastSeenNotif_${currentSemesterId}`, Date.now().toString());
+    const ts = Date.now();
+    localStorage.setItem(`lastSeenNotif_${currentSemesterId}`, ts.toString());
+
+    // Persist lastSeen to Firestore for this user so clearing is retained across devices
+    try {
+        const user = window.auth.currentUser;
+        if (user && currentSemesterId) {
+            const updateObj = {};
+            updateObj[`lastSeenNotif.${currentSemesterId}`] = ts;
+            window.db.collection('users').doc(user.uid).update(updateObj).then(() => {
+                // update local cache
+                window.userLastSeenMap = window.userLastSeenMap || {};
+                window.userLastSeenMap[currentSemesterId] = ts;
+            }).catch(err => {
+                console.warn('Failed to persist lastSeen to Firestore:', err);
+            });
+        }
+    } catch (e) {
+        console.warn('Error persisting lastSeen:', e);
+    }
 }
 
 /**

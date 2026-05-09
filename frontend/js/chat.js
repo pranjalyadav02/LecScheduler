@@ -16,6 +16,8 @@ async function initChat(semesterId, section, containerId) {
     if (activeChatListener) activeChatListener();
 
     const chatId = `${semesterId}_${section}`;
+    // expose current chat id for delete operations
+    window.currentChatId = chatId;
     console.log(`💬 Joining Chat: ${chatId}`);
 
     // Listen for real-time updates
@@ -93,6 +95,7 @@ function renderMessages(messages, containerId) {
             ${!isMe ? `<div class="msg-sender">${msg.senderName}</div>` : ''}
             <div class="msg-text">${escapeHtml(msg.text)}</div>
             <div class="msg-time">${timestamp}</div>
+            ${isMe ? `<button class="msg-delete" onclick="deleteChatMessage('${msg.id}')" title="Delete message">🗑️</button>` : ''}
         `;
         container.appendChild(msgDiv);
     });
@@ -108,4 +111,32 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+/**
+ * Delete a chat message if the current user is the sender.
+ */
+async function deleteChatMessage(messageId) {
+    try {
+        if (!messageId) return;
+        const user = window.auth.currentUser;
+        if (!user) return alert('You must be logged in to delete messages.');
+
+        const chatId = window.currentChatId;
+        if (!chatId) return;
+
+        const docRef = window.db.collection('chats').doc(chatId).collection('messages').doc(messageId);
+        const snap = await docRef.get();
+        if (!snap.exists) return alert('Message not found.');
+        const data = snap.data();
+        if (data.senderId !== user.uid) return alert('You can only delete your own messages.');
+
+        if (!confirm('Delete this message? This action cannot be undone.')) return;
+
+        await docRef.delete();
+        if (typeof showStatus === 'function') showStatus('chatStatus', '✓ Message deleted', 'success');
+    } catch (err) {
+        console.error('Failed to delete message:', err);
+        if (typeof showStatus === 'function') showStatus('chatStatus', `Error: ${err.message}`, 'error');
+    }
 }
