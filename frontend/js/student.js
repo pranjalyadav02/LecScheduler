@@ -490,6 +490,16 @@ async function loadNotifications() {
         const serverLastSeen = (window.userLastSeenMap && window.userLastSeenMap[currentSemesterId]) || 0;
         const lastSeen = Math.max(localLastSeen, serverLastSeen || 0);
         console.log('loadNotifications lastSeen:', { localLastSeen, serverLastSeen, lastSeen });
+        // Update debug display
+        try {
+            const disp = document.getElementById('lastSeenDisplay');
+            if (disp) {
+                const localStr = localLastSeen ? new Date(localLastSeen).toLocaleString() + ` (${localLastSeen})` : 'none';
+                const serverStr = serverLastSeen ? (typeof serverLastSeen === 'number' ? new Date(serverLastSeen).toLocaleString() + ` (${serverLastSeen})` : JSON.stringify(serverLastSeen)) : 'none';
+                const combinedStr = lastSeen ? new Date(lastSeen).toLocaleString() + ` (${lastSeen})` : 'none';
+                disp.textContent = `lastSeen — local: ${localStr}, server: ${serverStr}, combined: ${combinedStr}`;
+            }
+        } catch (e) { /* ignore */ }
 
         const notifications = await window.db.collection('semesters').doc(currentSemesterId)
             .collection('notifications')
@@ -518,6 +528,14 @@ async function loadNotifications() {
                 item.classList.add('new-notif');
                 item.style.borderLeftColor = 'var(--primary-color)';
             }
+            // show sentAt debug next to notification title
+            try {
+                const sentDebug = document.createElement('div');
+                sentDebug.style.fontSize = '0.7rem';
+                sentDebug.style.color = 'var(--text-light)';
+                sentDebug.textContent = `sentAt: ${sentAt} (${sentAt ? new Date(sentAt).toLocaleString() : 'n/a'})`;
+                item.querySelector('.notification-header').appendChild(sentDebug);
+            } catch (e) { /* ignore */ }
             // Debug info for troubleshooting reappearing notifications
             try {
                 console.debug('notif:', { id: doc.id, sentAt, isNew, title: notif.title });
