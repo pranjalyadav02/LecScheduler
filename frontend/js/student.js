@@ -468,6 +468,7 @@ async function loadNotifications() {
         const localLastSeen = parseInt(localStorage.getItem(`lastSeenNotif_${currentSemesterId}`) || '0');
         const serverLastSeen = (window.userLastSeenMap && window.userLastSeenMap[currentSemesterId]) || 0;
         const lastSeen = Math.max(localLastSeen, serverLastSeen || 0);
+        console.log('loadNotifications lastSeen:', { localLastSeen, serverLastSeen, lastSeen });
 
         const notifications = await window.db.collection('semesters').doc(currentSemesterId)
             .collection('notifications')
@@ -490,11 +491,16 @@ async function loadNotifications() {
             item.className = 'notification-item';
             
             // Check if it's new (compare against combined lastSeen)
-            const sentAt = notif.sentAt ? notif.sentAt.toDate().getTime() : 0;
-            if (sentAt > lastSeen) {
+            const sentAt = notif.sentAt ? (typeof notif.sentAt.toDate === 'function' ? notif.sentAt.toDate().getTime() : notif.sentAt) : 0;
+            const isNew = sentAt > lastSeen;
+            if (isNew) {
                 item.classList.add('new-notif');
                 item.style.borderLeftColor = 'var(--primary-color)';
             }
+            // Debug info for troubleshooting reappearing notifications
+            try {
+                console.debug('notif:', { id: doc.id, sentAt, isNew, title: notif.title });
+            } catch (e) { /* ignore */ }
             
             const timestamp = notif.sentAt ? new Date(notif.sentAt.toDate()).toLocaleString() : '--';
             const icon = getNotificationIcon(notif.type);
