@@ -67,12 +67,22 @@ try {
     console.log('Could not enable offline persistence:', err.message);
 }
 
+// Initialize Firebase Messaging (for push notifications)
+let messagingService = null;
+try {
+    messagingService = firebase.messaging();
+    console.log('✓ Firebase Messaging initialized');
+} catch (err) {
+    console.log('Firebase Messaging not available in this context:', err.message);
+}
+
 // Make services globally available
 window.firebaseApp = {
     auth: authService,
     db: dbService,
     storage: storageService,
     functions: functionsService,
+    messaging: messagingService,
     firebase
 };
 
@@ -81,6 +91,7 @@ window.auth = authService;
 window.db = dbService;
 window.storage = storageService;
 window.functions = functionsService;
+window.messaging = messagingService;
 
 // Expose a promise that resolves when firebase is initialized
 window.firebaseReady = (async function waitForInit() {

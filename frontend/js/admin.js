@@ -42,6 +42,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             document.getElementById('adminName').textContent = user.displayName || 'Admin';
+            
+            // Initialize Firebase Cloud Messaging for push notifications
+            if (typeof initializeMessaging === 'function') {
+                initializeMessaging().catch(err => 
+                    console.warn('Messaging initialization error:', err)
+                );
+            }
+            
             loadSemesters();
         });
     } catch (error) {

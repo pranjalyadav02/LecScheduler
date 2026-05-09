@@ -46,6 +46,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await loadTimetable();
                 await loadNotifications();
                 
+                // Initialize Firebase Cloud Messaging for push notifications
+                if (typeof initializeMessaging === 'function') {
+                    initializeMessaging().catch(err => 
+                        console.warn('Messaging initialization error:', err)
+                    );
+                }
+                
                 // Initialize real-time chat via chat.js
                 if(typeof initChat === 'function') {
                     initChat(currentSemesterId, currentSection, 'chatMessages');

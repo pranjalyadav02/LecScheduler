@@ -46,6 +46,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
 
                 currentSemesterId = assignedSemesters[0];
+                
+                // Initialize Firebase Cloud Messaging for push notifications
+                if (typeof initializeMessaging === 'function') {
+                    initializeMessaging().catch(err => 
+                        console.warn('Messaging initialization error:', err)
+                    );
+                }
+                
                 await refreshDashboard();
                 
                 // Keep Chat Semester sync
