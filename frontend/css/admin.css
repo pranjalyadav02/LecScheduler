@@ -897,6 +897,66 @@ textarea {
     margin-bottom: 1rem;
 }
 
+/* ============================================================================
+   SMALL FIXES FOR HEADER / ATTRIBUTES THAT CAN OVERFLOW ON MOBILE
+   Ensure elements (Resources, clock, name, logout) wrap and shrink.
+   ============================================================================ */
+.header-right {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.header-right > * {
+    flex: 0 1 auto;
+    min-width: 0; /* allow items to shrink below their content width */
+}
+.live-clock {
+    min-width: 120px;
+    max-width: 40%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .live-clock {
+        min-width: 90px;
+        max-width: 45%;
+    }
+
+    .header-right .secondary-btn,
+    .header-right .logout-btn {
+        padding: 0.45rem 0.6rem;
+        font-size: 0.95rem;
+    }
+
+    .student-header h1 {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .live-clock {
+        min-width: 70px;
+        max-width: 55%;
+        font-size: 0.85rem;
+    }
+
+    .header-right .secondary-btn,
+    .header-right .logout-btn {
+        padding: 0.35rem 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    /* make long labels wrap inside meta/info blocks */
+    .semester-info,
+    .timetable-meta,
+    .notification-header small,
+    .lecture-details {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+}
+
 .message {
     max-width: 80%;
     padding: 0.75rem;
